@@ -17,15 +17,18 @@ public class BenchmarkRunner {
         "partially_sorted_10pct"
     };
 
+    // Gia tri CUTOFF duoc chon de so sanh dien rong
+    static final int CHOSEN_CUTOFF = 16;
+
     public static void main(String[] args) throws Exception {
-        System.out.println("Bat dau benchmark (7 bo du lieu)...\n");
+        System.out.println("Bat dau benchmark (CUTOFF = " + CHOSEN_CUTOFF + ", 7 bo du lieu)...\n");
         new File("results").mkdirs();
 
         PrintWriter raw = new PrintWriter("results/raw_results.csv", "UTF-8");
         raw.println("size,type,algorithm,cutoff,rep,time_ms");
 
-        // Phan 1: So sanh MergeSort vs OptimizedMergeSort (cutoff=8) tren ca 7 kieu du lieu
-        System.out.println("--- So sanh MergeSort vs OptimizedMergeSort tren 7 kieu du lieu ---");
+        // Phan 1: So sanh MergeSort vs OptimizedMergeSort (CUTOFF = 16) tren ca 7 kieu du lieu
+        System.out.println("--- So sanh MergeSort vs OptimizedMergeSort (CUTOFF = " + CHOSEN_CUTOFF + ") ---");
         PrintWriter sumWriter = new PrintWriter("results/summary.csv", "UTF-8");
         sumWriter.println("size,type,merge_ms,optimized_ms,speedup_pct");
 
@@ -41,7 +44,7 @@ public class BenchmarkRunner {
                     Integer[] tmp = data.clone();
                     MergeSort.sort(tmp);
                     tmp = data.clone();
-                    OptimizedMergeSort.sort(tmp, 8);
+                    OptimizedMergeSort.sort(tmp, CHOSEN_CUTOFF);
                 }
 
                 // Do thuc te
@@ -54,9 +57,9 @@ public class BenchmarkRunner {
 
                     Integer[] b = data.clone();
                     t0 = System.nanoTime();
-                    OptimizedMergeSort.sort(b, 8);
+                    OptimizedMergeSort.sort(b, CHOSEN_CUTOFF);
                     optT[r] = (System.nanoTime() - t0) / 1e6;
-                    raw.println(size + "," + type + ",OptimizedMergeSort,8," + r + "," + optT[r]);
+                    raw.println(size + "," + type + ",OptimizedMergeSort," + CHOSEN_CUTOFF + "," + r + "," + optT[r]);
                 }
 
                 double avgM = mean(mergeT);
@@ -69,8 +72,8 @@ public class BenchmarkRunner {
         }
         sumWriter.close();
 
-        // Phan 2: Tim cutoff toi uu tren n=100000 (random)
-        System.out.println("\n--- Tim cutoff toi uu (n=100000, random) ---");
+        // Phan 2: Tim CUTOFF toi uu tren n=100000 (random)
+        System.out.println("\n--- Khao sat cac gia tri CUTOFF (n=100000, random) ---");
         PrintWriter cutWriter = new PrintWriter("results/cutoff_results.csv", "UTF-8");
         cutWriter.println("cutoff,time_ms");
 
@@ -94,7 +97,7 @@ public class BenchmarkRunner {
 
             double avg = mean(times);
             cutWriter.printf("%d,%.3f%n", cutoff, avg);
-            System.out.printf("  cutoff=%-3d  avg=%.3f ms%n", cutoff, avg);
+            System.out.printf("  CUTOFF=%-3d  avg=%.3f ms%n", cutoff, avg);
         }
         cutWriter.close();
         raw.close();

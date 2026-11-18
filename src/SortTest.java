@@ -20,7 +20,7 @@ public class SortTest {
         MergeSort.sort(a1);
 
         Integer[] a2 = arr.clone();
-        OptimizedMergeSort.sort(a2, 8);
+        OptimizedMergeSort.sort(a2, 16);
 
         boolean ok1 = Arrays.equals(a1, expected);
         boolean ok2 = Arrays.equals(a2, expected);
@@ -61,7 +61,7 @@ public class SortTest {
     }
 
     static void testOptimizedMergeSort() {
-        System.out.println("\n=== Kiem tra OptimizedMergeSort (cac gia tri cutoff) ===");
+        System.out.println("\n=== Kiem tra OptimizedMergeSort (cac gia tri CUTOFF) ===");
 
         int[] cutoffs = {1, 4, 8, 16, 32};
         for (int c : cutoffs) {
@@ -70,17 +70,17 @@ public class SortTest {
             Arrays.sort(expected);
             OptimizedMergeSort.sort(arr, c);
             boolean ok = Arrays.equals(arr, expected);
-            System.out.println("  PASS cutoff=" + c + ": " + (ok ? "PASS" : "FAIL"));
+            System.out.println("  PASS CUTOFF=" + c + ": " + (ok ? "PASS" : "FAIL"));
             if (ok) passed++; else failed++;
         }
 
-        Integer[] exact = new Integer[8];
-        for (int i = 0; i < 8; i++) exact[i] = 8 - i;
-        check("Dung bang cutoff (n=8, cutoff=8)", exact);
+        Integer[] exact = new Integer[16];
+        for (int i = 0; i < 16; i++) exact[i] = 16 - i;
+        check("Dung bang CUTOFF (n=16, CUTOFF=16)", exact);
 
-        Integer[] overCutoff = new Integer[9];
-        for (int i = 0; i < 9; i++) overCutoff[i] = 9 - i;
-        check("Vuot cutoff (n=9, cutoff=8)", overCutoff);
+        Integer[] overCutoff = new Integer[17];
+        for (int i = 0; i < 17; i++) overCutoff[i] = 17 - i;
+        check("Vuot CUTOFF (n=17, CUTOFF=16)", overCutoff);
     }
 
     static void testPartiallySorted() {
@@ -88,7 +88,6 @@ public class SortTest {
         Random rng = new Random(12345);
         int n = 1000;
 
-        // Partially Sorted 1%
         Integer[] p1 = new Integer[n];
         for (int i = 0; i < n; i++) p1[i] = i;
         for (int i = 0; i < (int)(n * 0.01); i++) {
@@ -97,7 +96,6 @@ public class SortTest {
         }
         check("Partially Sorted (1% xao tron)", p1);
 
-        // Partially Sorted 5%
         Integer[] p5 = new Integer[n];
         for (int i = 0; i < n; i++) p5[i] = i;
         for (int i = 0; i < (int)(n * 0.05); i++) {
@@ -106,7 +104,6 @@ public class SortTest {
         }
         check("Partially Sorted (5% xao tron)", p5);
 
-        // Partially Sorted 10%
         Integer[] p10 = new Integer[n];
         for (int i = 0; i < n; i++) p10[i] = i;
         for (int i = 0; i < (int)(n * 0.10); i++) {

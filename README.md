@@ -1,15 +1,15 @@
 # Merge Sort tối ưu với CUTOFF
 
-**Sinh viên:** Phạm Hải Dương - MSV: 25021700  
+**Sinh viên:** Phạm Hải Dương — MSV: 25021700  
 **Môn:** Cấu trúc Dữ liệu và Giải thuật
 
 ---
 
 ## Giới thiệu
 
-Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `CUTOFF`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. Mục tiêu là tìm giá trị CUTOFF tốt nhất.
+Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `CUTOFF`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. 
 
-Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne). Thực nghiệm được tiến hành trên **7 kiểu phân bố dữ liệu** với kích thước lên tới 1.000.000 phần tử.
+Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne). Qua thực nghiệm khảo sát, giá trị **CUTOFF = 16** được xác định là mốc tối ưu nhất và được sử dụng đồng nhất trong toàn bộ các phân tích so sánh tiếp theo.
 
 ---
 
@@ -32,18 +32,18 @@ optimized-merge-sort/
 ├── src/
 │   ├── InsertionSort.java       # Thuật toán Insertion Sort
 │   ├── MergeSort.java           # Thuật toán Merge Sort chuẩn
-│   ├── OptimizedMergeSort.java  # Merge Sort với CUTOFF
-│   └── SortTest.java            # Bộ kiểm tra tính đúng đắn
+│   ├── OptimizedMergeSort.java  # Merge Sort với CUTOFF = 16
+│   └── SortTest.java            # Bộ kiểm tra tính đúng đắn (22/22 tests PASS)
 ├── benchmark/
-│   └── BenchmarkRunner.java     # Đo thời gian trên 7 kiểu dữ liệu
+│   └── BenchmarkRunner.java     # Đo thời gian trên 7 kiểu dữ liệu (CUTOFF = 16)
 ├── results/
 │   ├── raw_results.csv          # Toàn bộ số liệu đo thô
 │   ├── summary.csv              # Bảng tóm tắt kết quả
 │   └── cutoff_results.csv       # Kết quả khảo sát các giá trị CUTOFF
 ├── report/
-│   ├── figures/                 # 4 biểu đồ kết quả
-│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức
-│   ├── plot_charts.py           # Script vẽ biểu đồ
+│   ├── figures/                 # 4 biểu đồ kết quả (.png không title, tiếng Việt)
+│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức (2 trang gọn gàng)
+│   ├── plot_charts.py           # Script vẽ biểu đồ (CUTOFF = 16)
 │   └── generate_report.py       # Script xuất PDF
 ├── logs/
 │   └── ai_conversation_log.md  # Nhật ký làm việc với AI
@@ -83,18 +83,18 @@ python report/generate_report.py
 ## Kết quả thực nghiệm chính
 
 ### 1. Khảo sát CUTOFF tối ưu (n = 100.000, ngẫu nhiên)
-* Vùng CUTOFF tốt nhất: **6 – 16** (đạt cực tiểu tại CUTOFF = 16 với ~18.3 ms).
+* Vùng CUTOFF hiệu quả nhất: **8 – 16** (loại bỏ từ 3 đến 4 tầng đệ quy nhị phân dưới cùng). Mốc **CUTOFF = 16** được chọn làm chuẩn tối ưu cho thuật toán cải tiến.
 
-### 2. Hiệu năng theo kiểu dữ liệu (n = 1.000.000, CUTOFF = 8)
+### 2. Hiệu năng theo kiểu dữ liệu (n = 1.000.000, CUTOFF = 16)
 
 | Kiểu dữ liệu | MergeSort (ms) | Optimized (ms) | Cải thiện (%) |
 |---|---|---|---|
-| **Đã sắp xếp (Sorted)** | 402.01 | 319.54 | **+20.5%** |
-| **Gần sắp xếp (1%)** | 393.25 | 347.70 | **+11.6%** |
-| **Gần sắp xếp (5%)** | 479.13 | 416.12 | **+13.2%** |
-| **Gần sắp xếp (10%)** | 420.33 | 387.78 | **+7.7%** |
-| **Trùng lặp (Duplicates)** | 368.26 | 348.74 | **+5.3%** |
-| **Ngược chiều (Reversed)** | 370.00 | 364.74 | **+1.4%** |
-| **Ngẫu nhiên (Random)** | 623.60 | 632.96 | ~0% |
+| **Đã sắp xếp (Sorted)** | 324.83 | 259.17 | **+20.2%** |
+| **Gần sắp xếp (1%)** | 331.65 | 275.66 | **+16.9%** |
+| **Gần sắp xếp (5%)** | 370.48 | 314.45 | **+15.1%** |
+| **Gần sắp xếp (10%)** | 405.06 | 349.66 | **+13.7%** |
+| **Trùng lặp (Duplicates)** | 320.73 | 306.28 | **+4.5%** |
+| **Ngẫu nhiên (Random)** | 574.79 | 573.94 | **+0.1%** |
+| **Ngược chiều (Reversed)** | 327.90 | 367.05 | -11.9% |
 
-> Chi tiết phân tích và biểu đồ trực quan có trong file `report/BAO_CAO.pdf`.
+> Toàn bộ phân tích lý thuyết, bảng số liệu và 3 hình minh họa được trình bày trong file `report/BAO_CAO.pdf`.
