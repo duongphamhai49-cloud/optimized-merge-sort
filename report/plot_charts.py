@@ -20,14 +20,15 @@ plt.rcParams.update({
 cutoff_df = pd.read_csv('results/cutoff_results.csv')
 summary_df = pd.read_csv('results/summary.csv')
 
+best_idx = cutoff_df['time_ms'].idxmin()
+best_c = int(cutoff_df.loc[best_idx, 'cutoff'])
+best_t = cutoff_df.loc[best_idx, 'time_ms']
+
 # ==============================================
 # Hinh 1: CUTOFF vs Thoi gian (n=100000, random)
 # ==============================================
 fig, ax = plt.subplots(figsize=(7.8, 4.0))
 ax.plot(cutoff_df['cutoff'], cutoff_df['time_ms'], 'o-', color='black', linewidth=1.5, markersize=5)
-best_idx = cutoff_df['time_ms'].idxmin()
-best_c = int(cutoff_df.loc[best_idx, 'cutoff'])
-best_t = cutoff_df.loc[best_idx, 'time_ms']
 ax.axvline(x=best_c, color='gray', linestyle='--', linewidth=1)
 ax.annotate(f'CUTOFF = {best_c}\n({best_t:.1f} ms)', xy=(best_c, best_t),
             xytext=(best_c + 3, best_t + 1.2), fontsize=9)
@@ -45,7 +46,7 @@ rand_df = summary_df[summary_df['type'] == 'random'].copy().sort_values('size')
 
 fig, ax = plt.subplots(figsize=(7.8, 4.0))
 ax.plot(rand_df['size'], rand_df['merge_ms'], 's--', color='black', linewidth=1.5, markersize=5, label='MergeSort')
-ax.plot(rand_df['size'], rand_df['optimized_ms'], 'o-', color='dimgray', linewidth=1.5, markersize=5, label='OptimizedMergeSort (CUTOFF = 16)')
+ax.plot(rand_df['size'], rand_df['optimized_ms'], 'o-', color='dimgray', linewidth=1.5, markersize=5, label=f'OptimizedMergeSort (CUTOFF = {best_c})')
 ax.set_xlabel('Kích thước mảng (n)')
 ax.set_ylabel('Thời gian trung bình (ms)')
 ax.legend()
@@ -61,7 +62,7 @@ fig, ax = plt.subplots(figsize=(7.8, 4.0))
 x = np.arange(len(rand_df))
 w = 0.35
 ax.bar(x - w/2, rand_df['merge_ms'], w, label='MergeSort', color='white', edgecolor='black', linewidth=1)
-ax.bar(x + w/2, rand_df['optimized_ms'], w, label='OptimizedMergeSort (CUTOFF = 16)', color='lightgray', edgecolor='black', linewidth=1)
+ax.bar(x + w/2, rand_df['optimized_ms'], w, label=f'OptimizedMergeSort (CUTOFF = {best_c})', color='lightgray', edgecolor='black', linewidth=1)
 ax.set_xticks(x)
 ax.set_xticklabels([f'{int(s):,}' for s in rand_df['size']], fontsize=9)
 ax.set_xlabel('Kích thước mảng (n)')
@@ -91,7 +92,7 @@ fig, ax = plt.subplots(figsize=(9.2, 4.2))
 x = np.arange(len(large_df))
 w = 0.35
 ax.bar(x - w/2, large_df['merge_ms'], w, label='MergeSort', color='white', edgecolor='black', linewidth=1)
-ax.bar(x + w/2, large_df['optimized_ms'], w, label='OptimizedMergeSort (CUTOFF = 16)', color='lightgray', edgecolor='black', linewidth=1)
+ax.bar(x + w/2, large_df['optimized_ms'], w, label=f'OptimizedMergeSort (CUTOFF = {best_c})', color='lightgray', edgecolor='black', linewidth=1)
 ax.set_xticks(x)
 ax.set_xticklabels(large_df['type_vi'], fontsize=9, rotation=10)
 ax.set_xlabel('Kiểu phân bố dữ liệu')
@@ -102,4 +103,4 @@ fig.tight_layout()
 fig.savefig('report/figures/fig4_distribution.png')
 plt.close()
 
-print("Đã cập nhật script vẽ biểu đồ với CUTOFF = 16.")
+print(f"Đã cập nhật script vẽ biểu đồ tự động theo CUTOFF = {best_c}.")

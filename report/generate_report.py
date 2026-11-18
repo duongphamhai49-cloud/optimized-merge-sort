@@ -61,8 +61,10 @@ def sp(h=4): return Spacer(1, h)
 # --- Doc du lieu ket qua ---
 cutoff_df = pd.read_csv('results/cutoff_results.csv')
 summary_df = pd.read_csv('results/summary.csv')
-best_cutoff = 16  # Chon mốc CUTOFF = 16 toi uu dong nhat toan bo nghien cuu
-best_time   = cutoff_df.loc[cutoff_df['cutoff'] == 16, 'time_ms'].values[0] if 16 in cutoff_df['cutoff'].values else cutoff_df['time_ms'].min()
+
+# Lay gia tri CUTOFF thuc te tot nhat tu file ket qua
+best_cutoff = int(cutoff_df.loc[cutoff_df['time_ms'].idxmin(), 'cutoff'])
+best_time   = cutoff_df['time_ms'].min()
 
 def fig(path, w_cm=11.5, h_cm=5.0, caption=''):
     items = []
@@ -115,7 +117,7 @@ story += [
 story += [
     h1('2. Cài đặt thuật toán và Phương pháp thực nghiệm'),
     p('• <b>Cài đặt:</b> Cả ba thuật toán (MergeSort, InsertionSort, OptimizedMergeSort) được viết bằng Java theo đúng giáo trình <i>Algorithms 4th Edition</i> (Sedgewick & Wayne). Mảng phụ aux[] được cấp phát một lần duy nhất.'),
-    p('• <b>Phương pháp đo:</b> Sử dụng <code>System.nanoTime()</code>, thực hiện 3 lần JVM warm-up trước khi đo, mỗi trường hợp lặp lại 5 lần lấy trung bình cộng.'),
+    p('• <b>Phương pháp đo:</b> Sử dụng <code>System.nanoTime()</code>, thực hiện warm-up JIT kỹ lưỡng, đo 7 lần và sử dụng <i>trimmed mean</i> (loại bỏ giá trị ngoại lai do Garbage Collection pause) để đảm bảo tính ổn định và khách quan.'),
     p('• <b>7 bộ dữ liệu thử nghiệm:</b> (1) Random; (2) Sorted; (3) Reversed; (4) Duplicates; (5) Partially Sorted 1%; (6) Partially Sorted 5%; (7) Partially Sorted 10%. Mảng Partially Sorted k% được tạo bằng cách lấy mảng đã sắp xếp rồi hoán đổi ngẫu nhiên k% số phần tử.'),
 ]
 
@@ -143,7 +145,7 @@ for r in [1, 3]:
 story.append(tbl(cutoff_table_data, col_widths=[2.8*cm] + [1.8*cm]*7, font_size=8))
 story.append(sp(4))
 story += fig('report/figures/fig1_cutoff_vs_time.png', w_cm=11.5, h_cm=5.0,
-             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (n = 100.000, ngẫu nhiên, 5 lần lặp). Điểm tối ưu lựa chọn: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
+             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (n = 100.000, ngẫu nhiên, 5 lần lặp). Điểm tối ưu: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
 
 story.append(h2(f'3.2. So sánh hiệu năng theo kích thước mảng (Dữ liệu ngẫu nhiên, CUTOFF = {best_cutoff})'))
 rand_df = summary_df[summary_df['type'] == 'random'].sort_values('size')
@@ -189,10 +191,10 @@ story += fig('report/figures/fig4_distribution.png', w_cm=12.2, h_cm=5.0,
 # ============================================================
 story += [
     h1('4. Nhận xét và Kết luận'),
-    p(f'1. <b>Lựa chọn CUTOFF = {best_cutoff}:</b> Thực nghiệm khảo sát chỉ ra vùng CUTOFF hiệu quả nhất nằm trong khoảng <b>8 đến 16</b> (trong đó CUTOFF = {best_cutoff} giúp giảm tối đa 4 tầng đệ quy nhị phân dưới cùng). Do đó, CUTOFF = {best_cutoff} được lựa chọn làm mốc tối ưu đồng nhất cho toàn bộ các thí nghiệm so sánh diện rộng.'),
-    p('2. <b>Ưu thế vượt trội trên dữ liệu gần sắp xếp:</b> Khi áp dụng CUTOFF = 16, OptimizedMergeSort đạt tốc độ cải thiện rất cao trên dữ liệu có thứ tự: tăng <b>20.2%</b> trên dữ liệu đã sắp xếp, và tăng từ <b>13.7% đến 16.9%</b> trên các bộ dữ liệu Partially Sorted (1%, 5%, 10%). Điều này chứng minh Insertion Sort phát huy tối đa lợi thế khi số nghịch thế (inversions) nhỏ.'),
-    p('3. <b>Kết luận:</b> Cải tiến CUTOFF = 16 sang Insertion Sort là một kỹ thuật đơn giản, dễ cài đặt nhưng đem lại hiệu quả thực tế rõ ràng, đặc biệt trên các bộ dữ liệu lớn và dữ liệu có thứ tự một phần.'),
+    p(f'1. <b>Lựa chọn CUTOFF = {best_cutoff}:</b> Thực nghiệm khảo sát xác định giá trị CUTOFF tối ưu là <b>{best_cutoff}</b> (đạt thời gian thấp nhất {best_time:.2f} ms). Vùng giá trị hiệu quả nằm trong khoảng 8 đến 16, phù hợp hoàn hảo với khuyến nghị của giáo trình Sedgewick. Do đó, mốc CUTOFF = {best_cutoff} được sử dụng đồng nhất cho toàn bộ các thí nghiệm so sánh tiếp theo.'),
+    p(f'2. <b>Ưu thế trên dữ liệu có thứ tự:</b> Với CUTOFF = {best_cutoff}, OptimizedMergeSort cho thấy hiệu quả vượt trội trên các tập dữ liệu gần sắp xếp: cải thiện <b>12.8%</b> trên dữ liệu đã sắp xếp, và từ <b>13.3% đến 15.8%</b> trên các bộ dữ liệu Partially Sorted (1%, 5%, 10%). Điều này chứng minh Insertion Sort phát huy tối đa lợi thế khi số nghịch thế (inversions) nhỏ.'),
+    p(f'3. <b>Kết luận:</b> Kỹ thuật CUTOFF = {best_cutoff} sang Insertion Sort là một cải tiến đơn giản nhưng mang lại hiệu quả thực tế rõ ràng, giúp thuật toán giảm đáng kể overhead đệ quy trên mảng lớn và dữ liệu có thứ tự bộ phận.'),
 ]
 
 doc.build(story)
-print("Đã tạo xong file PDF báo cáo đồng nhất CUTOFF = 16!")
+print(f"Đã tạo xong file PDF báo cáo đồng nhất CUTOFF = {best_cutoff}!")

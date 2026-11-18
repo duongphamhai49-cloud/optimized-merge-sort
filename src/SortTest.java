@@ -20,7 +20,7 @@ public class SortTest {
         MergeSort.sort(a1);
 
         Integer[] a2 = arr.clone();
-        OptimizedMergeSort.sort(a2, 16);
+        OptimizedMergeSort.sort(a2, 8);
 
         boolean ok1 = Arrays.equals(a1, expected);
         boolean ok2 = Arrays.equals(a2, expected);
@@ -74,13 +74,13 @@ public class SortTest {
             if (ok) passed++; else failed++;
         }
 
-        Integer[] exact = new Integer[16];
-        for (int i = 0; i < 16; i++) exact[i] = 16 - i;
-        check("Dung bang CUTOFF (n=16, CUTOFF=16)", exact);
+        Integer[] exact = new Integer[8];
+        for (int i = 0; i < 8; i++) exact[i] = 8 - i;
+        check("Dung bang CUTOFF (n=8, CUTOFF=8)", exact);
 
-        Integer[] overCutoff = new Integer[17];
-        for (int i = 0; i < 17; i++) overCutoff[i] = 17 - i;
-        check("Vuot CUTOFF (n=17, CUTOFF=16)", overCutoff);
+        Integer[] overCutoff = new Integer[9];
+        for (int i = 0; i < 9; i++) overCutoff[i] = 9 - i;
+        check("Vuot CUTOFF (n=9, CUTOFF=8)", overCutoff);
     }
 
     static void testPartiallySorted() {
