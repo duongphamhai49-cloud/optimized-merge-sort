@@ -64,7 +64,7 @@ summary_df = pd.read_csv('results/summary.csv')
 best_cutoff = int(cutoff_df.loc[cutoff_df['time_ms'].idxmin(), 'cutoff'])
 best_time   = cutoff_df['time_ms'].min()
 
-def fig(path, w_cm=11.5, h_cm=5.5, caption=''):
+def fig(path, w_cm=11.5, h_cm=5.0, caption=''):
     items = []
     if os.path.exists(path):
         items.append(Image(path, width=w_cm*cm, height=h_cm*cm))
@@ -142,8 +142,8 @@ for r in [1, 3]:
 
 story.append(tbl(cutoff_table_data, col_widths=[2.8*cm] + [1.8*cm]*7, font_size=8))
 story.append(sp(4))
-story += fig('report/figures/fig1_cutoff_vs_time.png', w_cm=11.5, h_cm=5.2,
-             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (n=100.000, ngẫu nhiên). Giá trị tối ưu: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
+story += fig('report/figures/fig1_cutoff_vs_time.png', w_cm=11.5, h_cm=5.0,
+             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (n = 100.000, ngẫu nhiên, 5 lần lặp). Giá trị tối ưu: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
 
 story.append(h2('3.2. So sánh hiệu năng theo kích thước mảng (Dữ liệu ngẫu nhiên, CUTOFF = 8)'))
 rand_df = summary_df[summary_df['type'] == 'random'].sort_values('size')
@@ -157,8 +157,8 @@ for _, row in rand_df.iterrows():
     ])
 story.append(tbl(size_data, col_widths=[4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm], font_size=8.5))
 story.append(sp(4))
-story += fig('report/figures/fig2_size_vs_time.png', w_cm=11.5, h_cm=5.2,
-             caption='Hình 2. Thời gian chạy của MergeSort và OptimizedMergeSort theo kích thước mảng.')
+story += fig('report/figures/fig2_size_vs_time.png', w_cm=11.5, h_cm=5.0,
+             caption='Hình 2. Thời gian chạy của MergeSort và OptimizedMergeSort theo kích thước mảng (dữ liệu ngẫu nhiên, 5 lần lặp).')
 
 story.append(h2('3.3. Đánh giá hiệu năng trên 7 kiểu dữ liệu (n = 1.000.000, CUTOFF = 8)'))
 large_df = summary_df[summary_df['size'] == 1000000]
@@ -181,8 +181,8 @@ for _, row in large_df.iterrows():
     ])
 story.append(tbl(dist_data, col_widths=[5.5*cm, 3.5*cm, 3.5*cm, 3.5*cm], font_size=8.5))
 story.append(sp(4))
-story += fig('report/figures/fig4_distribution.png', w_cm=12.5, h_cm=5.5,
-             caption='Hình 3. So sánh hiệu năng giữa hai thuật toán trên 7 kiểu dữ liệu đầu vào (n = 1.000.000).')
+story += fig('report/figures/fig4_distribution.png', w_cm=12.2, h_cm=5.0,
+             caption='Hình 3. So sánh hiệu năng giữa hai thuật toán trên 7 kiểu dữ liệu đầu vào (n = 1.000.000, 5 lần lặp).')
 
 # ============================================================
 # 4. KET LUAN
@@ -195,4 +195,4 @@ story += [
 ]
 
 doc.build(story)
-print("Đã tạo thành công báo cáo PDF với tiêu đề mới và chữ CUTOFF in hoa.")
+print("Đã tạo xong file PDF báo cáo!")

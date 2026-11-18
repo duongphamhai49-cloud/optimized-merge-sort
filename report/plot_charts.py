@@ -12,7 +12,6 @@ plt.rcParams.update({
     'font.family': 'serif',
     'font.serif': ['Times New Roman', 'DejaVu Serif'],
     'font.size': 10,
-    'axes.titlesize': 11,
     'axes.labelsize': 10,
     'figure.dpi': 150,
 })
@@ -24,7 +23,7 @@ summary_df = pd.read_csv('results/summary.csv')
 # ==============================================
 # Hinh 1: CUTOFF vs Thoi gian (n=100000, random)
 # ==============================================
-fig, ax = plt.subplots(figsize=(8, 4.8))
+fig, ax = plt.subplots(figsize=(7.8, 4.0))
 ax.plot(cutoff_df['cutoff'], cutoff_df['time_ms'], 'o-', color='black', linewidth=1.5, markersize=5)
 best_idx = cutoff_df['time_ms'].idxmin()
 best_c = int(cutoff_df.loc[best_idx, 'cutoff'])
@@ -34,7 +33,7 @@ ax.annotate(f'CUTOFF = {best_c}\n({best_t:.1f} ms)', xy=(best_c, best_t),
             xytext=(best_c + 3, best_t + 1.2), fontsize=9)
 ax.set_xlabel('Giá trị CUTOFF')
 ax.set_ylabel('Thời gian trung bình (ms)')
-ax.set_title('Hình 1. Ảnh hưởng của CUTOFF đến thời gian sắp xếp\n(n = 100.000, dữ liệu ngẫu nhiên, 5 lần lặp)')
+# Khong de title trong anh theo yeu cau, tieu de se duoc ghi trong file bao cao
 ax.grid(True, linestyle=':', alpha=0.6)
 fig.tight_layout()
 fig.savefig('report/figures/fig1_cutoff_vs_time.png')
@@ -45,12 +44,11 @@ plt.close()
 # ==============================================
 rand_df = summary_df[summary_df['type'] == 'random'].copy().sort_values('size')
 
-fig, ax = plt.subplots(figsize=(8, 4.8))
+fig, ax = plt.subplots(figsize=(7.8, 4.0))
 ax.plot(rand_df['size'], rand_df['merge_ms'], 's--', color='black', linewidth=1.5, markersize=5, label='MergeSort')
 ax.plot(rand_df['size'], rand_df['optimized_ms'], 'o-', color='dimgray', linewidth=1.5, markersize=5, label='OptimizedMergeSort (CUTOFF = 8)')
 ax.set_xlabel('Kích thước mảng (n)')
 ax.set_ylabel('Thời gian trung bình (ms)')
-ax.set_title('Hình 2. Thời gian sắp xếp theo kích thước mảng\n(dữ liệu ngẫu nhiên, 5 lần lặp)')
 ax.legend()
 ax.grid(True, linestyle=':', alpha=0.6)
 fig.tight_layout()
@@ -60,7 +58,7 @@ plt.close()
 # ==============================================
 # Hinh 3: So sanh MergeSort vs Optimized (all sizes, random)
 # ==============================================
-fig, ax = plt.subplots(figsize=(8, 4.8))
+fig, ax = plt.subplots(figsize=(7.8, 4.0))
 x = np.arange(len(rand_df))
 w = 0.35
 ax.bar(x - w/2, rand_df['merge_ms'], w, label='MergeSort', color='white', edgecolor='black', linewidth=1)
@@ -69,7 +67,6 @@ ax.set_xticks(x)
 ax.set_xticklabels([f'{int(s):,}' for s in rand_df['size']], fontsize=9)
 ax.set_xlabel('Kích thước mảng (n)')
 ax.set_ylabel('Thời gian trung bình (ms)')
-ax.set_title('Hình 3. So sánh MergeSort và OptimizedMergeSort\n(dữ liệu ngẫu nhiên)')
 ax.legend()
 ax.grid(True, axis='y', linestyle=':', alpha=0.6)
 fig.tight_layout()
@@ -91,7 +88,7 @@ type_names = {
 }
 large_df['type_vi'] = large_df['type'].map(type_names).fillna(large_df['type'])
 
-fig, ax = plt.subplots(figsize=(10, 5))
+fig, ax = plt.subplots(figsize=(9.2, 4.2))
 x = np.arange(len(large_df))
 w = 0.35
 ax.bar(x - w/2, large_df['merge_ms'], w, label='MergeSort', color='white', edgecolor='black', linewidth=1)
@@ -100,11 +97,10 @@ ax.set_xticks(x)
 ax.set_xticklabels(large_df['type_vi'], fontsize=9, rotation=10)
 ax.set_xlabel('Kiểu phân bố dữ liệu')
 ax.set_ylabel('Thời gian trung bình (ms)')
-ax.set_title('Hình 4. Hiệu năng trên 7 kiểu dữ liệu đầu vào\n(n = 1.000.000, 5 lần lặp)')
 ax.legend()
 ax.grid(True, axis='y', linestyle=':', alpha=0.6)
 fig.tight_layout()
 fig.savefig('report/figures/fig4_distribution.png')
 plt.close()
 
-print("Đã vẽ lại 4 biểu đồ với đầy đủ dấu tiếng Việt và chữ CUTOFF in hoa.")
+print("Đã vẽ lại 4 biểu đồ không có title trong ảnh.")
