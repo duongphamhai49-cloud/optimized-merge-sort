@@ -1,6 +1,6 @@
 # Merge Sort tối ưu với CUTOFF
 
-**Sinh viên:** Phạm Hải Dương — MSV: 25021700  
+**Sinh viên:** Phạm Hải Dương - MSV: 25021700  
 **Môn:** Cấu trúc Dữ liệu và Giải thuật
 
 ---
@@ -33,7 +33,7 @@ optimized-merge-sort/
 │   ├── InsertionSort.java       # Thuật toán Insertion Sort
 │   ├── MergeSort.java           # Thuật toán Merge Sort chuẩn
 │   ├── OptimizedMergeSort.java  # Merge Sort với CUTOFF
-│   └── SortTest.java            # Bộ kiểm tra tính đúng đắn (22/22 tests PASS)
+│   └── SortTest.java            # Bộ kiểm tra tính đúng đắn
 ├── benchmark/
 │   └── BenchmarkRunner.java     # Đo thời gian trên 7 kiểu dữ liệu
 ├── results/
@@ -41,8 +41,8 @@ optimized-merge-sort/
 │   ├── summary.csv              # Bảng tóm tắt kết quả
 │   └── cutoff_results.csv       # Kết quả khảo sát các giá trị CUTOFF
 ├── report/
-│   ├── figures/                 # 4 biểu đồ kết quả (.png có dấu tiếng Việt)
-│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức (2 trang gọn gàng)
+│   ├── figures/                 # 4 biểu đồ kết quả
+│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức
 │   ├── plot_charts.py           # Script vẽ biểu đồ
 │   └── generate_report.py       # Script xuất PDF
 ├── logs/
