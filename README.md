@@ -1,6 +1,6 @@
 # Merge Sort tối ưu với CUTOFF
 
-**Sinh viên:** Phạm Hải Dương — MSV: 25021700  
+**Sinh viên:** Phạm Hải Dương - MSV: 25021700  
 **Môn:** Cấu trúc Dữ liệu và Giải thuật
 
 ---
@@ -9,7 +9,7 @@
 
 Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `CUTOFF`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. 
 
-Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne). Qua thực nghiệm khảo sát với phương pháp loại bỏ ngoại lai (trimmed mean), giá trị **CUTOFF = 8** được xác định là mốc tối ưu nhất (18.41 ms) và được sử dụng đồng nhất trong toàn bộ các phân tích so sánh diện rộng.
+Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne). Qua thực nghiệm khảo sát, giá trị **CUTOFF = 8** được xác định là mốc tối ưu nhất (18.41 ms) và được sử dụng đồng nhất trong toàn bộ các phân tích so sánh diện rộng.
 
 ---
 
@@ -33,17 +33,17 @@ optimized-merge-sort/
 │   ├── InsertionSort.java       # Thuật toán Insertion Sort
 │   ├── MergeSort.java           # Thuật toán Merge Sort chuẩn
 │   ├── OptimizedMergeSort.java  # Merge Sort với CUTOFF = 8
-│   └── SortTest.java            # Bộ kiểm tra tính đúng đắn (22/22 tests PASS)
+│   └── SortTest.java            # Bộ kiểm tra tính đúng đắn
 ├── benchmark/
-│   └── BenchmarkRunner.java     # Đo thời gian trên 7 kiểu dữ liệu (CUTOFF = 8)
+│   └── BenchmarkRunner.java     # Đo thời gian trên 7 kiểu dữ liệu
 ├── results/
 │   ├── raw_results.csv          # Toàn bộ số liệu đo thô
 │   ├── summary.csv              # Bảng tóm tắt kết quả
 │   └── cutoff_results.csv       # Kết quả khảo sát các giá trị CUTOFF
 ├── report/
-│   ├── figures/                 # 4 biểu đồ kết quả (.png không title, tiếng Việt)
-│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức (2 trang gọn gàng)
-│   ├── plot_charts.py           # Script vẽ biểu đồ (CUTOFF = 8)
+│   ├── figures/                 # 4 biểu đồ kết quả
+│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức
+│   ├── plot_charts.py           # Script vẽ biểu đồ
 │   └── generate_report.py       # Script xuất PDF
 ├── logs/
 │   └── ai_conversation_log.md  # Nhật ký làm việc với AI
