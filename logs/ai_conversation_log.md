@@ -14,13 +14,13 @@ Dự án này được thực hiện với sự hỗ trợ của trợ lý AI (A
 
 ### Các phần AI đã hỗ trợ
 
-1. **Viết bộ test** — AI tạo `SortTest.java` với 19 test case kiểm tra tính đúng đắn của cả hai thuật toán.
+1. **Viết bộ test** - AI tạo `SortTest.java` với 19 test case kiểm tra tính đúng đắn của cả hai thuật toán.
 
-2. **Framework benchmark** — AI viết `BenchmarkRunner.java` đo thời gian sắp xếp cho nhiều kích thước mảng và nhiều giá trị cutoff, sử dụng `System.nanoTime()`.
+2. **Framework benchmark** - AI viết `BenchmarkRunner.java` đo thời gian sắp xếp cho nhiều kích thước mảng và nhiều giá trị cutoff, sử dụng `System.nanoTime()`.
 
-3. **Phân tích kết quả** — AI đọc kết quả CSV và phân tích cutoff nào cho hiệu năng tốt nhất.
+3. **Phân tích kết quả** - AI đọc kết quả CSV và phân tích cutoff nào cho hiệu năng tốt nhất.
 
-4. **Vẽ biểu đồ** — AI viết script Python tạo 4 biểu đồ từ dữ liệu thực nghiệm.
+4. **Vẽ biểu đồ** - AI viết script Python tạo 4 biểu đồ từ dữ liệu thực nghiệm.
 
 ---
 
