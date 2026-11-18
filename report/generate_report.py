@@ -48,25 +48,24 @@ def style(name, font='Times', size=10, leading=14, space_before=0, space_after=4
 
 S_title   = style('Title',   size=15, leading=19, bold=True, alignment=1, space_after=2)
 S_sub     = style('Sub',     size=10.5, leading=14, alignment=1, space_after=6)
-S_h1      = style('H1',      size=11.5, leading=15, bold=True, space_before=8, space_after=3)
-S_h2      = style('H2',      size=10.5, leading=14, bold=True, space_before=5, space_after=2)
-S_body    = style('Body',    size=9.5, leading=13.5, space_after=4)
-S_caption = style('Caption', size=8.5, leading=11, font='Times-Italic', alignment=1, space_after=6)
+S_h1      = style('H1',      size=11, leading=14.5, bold=True, space_before=7, space_after=2.5)
+S_h2      = style('H2',      size=10, leading=13.5, bold=True, space_before=4, space_after=2)
+S_body    = style('Body',    size=9.2, leading=13, space_after=3.5)
+S_caption = style('Caption', size=8.5, leading=11, font='Times-Italic', alignment=1, space_after=5)
 
 def p(text, s=None): return Paragraph(text, s or S_body)
 def h1(text): return Paragraph(text, S_h1)
 def h2(text): return Paragraph(text, S_h2)
-def sp(h=4): return Spacer(1, h)
+def sp(h=3): return Spacer(1, h)
 
 # --- Doc du lieu ket qua ---
 cutoff_df = pd.read_csv('results/cutoff_results.csv')
 summary_df = pd.read_csv('results/summary.csv')
 
-# Lay gia tri CUTOFF thuc te tot nhat tu file ket qua
 best_cutoff = int(cutoff_df.loc[cutoff_df['time_ms'].idxmin(), 'cutoff'])
 best_time   = cutoff_df['time_ms'].min()
 
-def fig(path, w_cm=11.5, h_cm=5.0, caption=''):
+def fig(path, w_cm=11.5, h_cm=4.8, caption=''):
     items = []
     if os.path.exists(path):
         items.append(Image(path, width=w_cm*cm, height=h_cm*cm))
@@ -84,8 +83,8 @@ def tbl(data, col_widths=None, font_size=8.5):
         ('GRID',     (0,0), (-1,-1), 0.5, colors.Color(0.4, 0.4, 0.4)),
         ('BACKGROUND', (0,0), (-1,0), colors.Color(0.9, 0.9, 0.9)),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.Color(0.97, 0.97, 0.97)]),
-        ('TOPPADDING',  (0,0), (-1,-1), 2.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 2.5),
+        ('TOPPADDING',  (0,0), (-1,-1), 2.2),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2.2),
     ]))
     return t
 
@@ -99,25 +98,25 @@ story += [
     p('TỐI ƯU HÓA MERGE SORT VỚI CUTOFF', S_title),
     sp(2),
     p('Sinh viên: Phạm Hải Dương &nbsp;|&nbsp; MSV: 25021700', S_sub),
-    HRFlowable(width="100%", thickness=1, color=colors.black, spaceBefore=2, spaceAfter=8),
+    HRFlowable(width="100%", thickness=1, color=colors.black, spaceBefore=2, spaceAfter=6),
 ]
 
 # ============================================================
 # 1. TONG QUAN DE TAI
 # ============================================================
 story += [
-    h1('1. Tổng quan và Cơ sở lý thuyết'),
+    h1('1. Giới thiệu và Bối cảnh Lý thuyết'),
     p('<b>Mục tiêu:</b> Khảo sát kỹ thuật cải tiến Merge Sort bằng cách chuyển sang Insertion Sort khi kích thước mảng con nhỏ hơn hoặc bằng một ngưỡng <b>CUTOFF</b> nhất định (<i>hi ≤ lo + CUTOFF − 1</i>).'),
-    p('<b>Lý thuyết:</b> Merge Sort có độ phức tạp O(n log n) nhưng với mảng con nhỏ, chi phí gọi đệ quy và trộn qua mảng phụ aux[] tạo ra overhead đáng kể. Insertion Sort có chi phí hằng số rất nhỏ, chạy nhanh trên mảng con ngắn và mảng gần như đã sắp xếp. Việc kết hợp hai thuật toán qua ngưỡng CUTOFF nhằm khai thác ưu thế của cả hai.'),
+    p('<b>Bối cảnh lý thuyết:</b> Merge Sort đạt độ phức tạp lý thuyết O(N log N) nhưng phát sinh overhead lớn khi phân rã đệ quy đến mảng con kích thước nhỏ. Trong giáo trình <i>Algorithms 4th Edition</i>, GS. Robert Sedgewick từng đề xuất CUTOFF = 7 (ấn bản cũ) và CUTOFF = 10 hoặc trong khoảng 8–16 (ấn bản mới). Nghiên cứu này nhằm kiểm chứng thực nghiệm ngưỡng tối ưu trên phần cứng hiện đại.'),
 ]
 
 # ============================================================
-# 2. CAI DAT VA PHUONG PHAP
+# 2. MOI TRUONG VA PHUONG PHAP
 # ============================================================
 story += [
-    h1('2. Cài đặt thuật toán và Phương pháp thực nghiệm'),
-    p('• <b>Cài đặt:</b> Cả ba thuật toán (MergeSort, InsertionSort, OptimizedMergeSort) được viết bằng Java theo đúng giáo trình <i>Algorithms 4th Edition</i> (Sedgewick & Wayne). Mảng phụ aux[] được cấp phát một lần duy nhất.'),
-    p('• <b>Phương pháp đo:</b> Sử dụng <code>System.nanoTime()</code>, thực hiện warm-up JIT kỹ lưỡng, đo 7 lần và sử dụng <i>trimmed mean</i> (loại bỏ giá trị ngoại lai do Garbage Collection pause) để đảm bảo tính ổn định và khách quan.'),
+    h1('2. Môi trường và Phương pháp Thực nghiệm'),
+    p('• <b>Môi trường đo:</b> CPU Intel Core i5-1135G7 (4 Cores, 8 Threads, 2.40 GHz), RAM 8 GB, Windows 11 64-bit, OpenJDK 21.0.11 LTS, Python 3.13 (Matplotlib, ReportLab).'),
+    p('• <b>Phương pháp đo:</b> Sử dụng <code>System.nanoTime()</code> kết hợp JVM warm-up. Khi khảo sát CUTOFF, đo 7 lần và áp dụng phương pháp <i>Trimmed Mean</i> (loại trừ giá trị ngoại lai do Garbage Collection pause) để đảm bảo tính khách quan và ổn định.'),
     p('• <b>7 bộ dữ liệu thử nghiệm:</b> (1) Random; (2) Sorted; (3) Reversed; (4) Duplicates; (5) Partially Sorted 1%; (6) Partially Sorted 5%; (7) Partially Sorted 10%. Mảng Partially Sorted k% được tạo bằng cách lấy mảng đã sắp xếp rồi hoán đổi ngẫu nhiên k% số phần tử.'),
 ]
 
@@ -126,7 +125,7 @@ story += [
 # ============================================================
 story += [
     h1('3. Kết quả thực nghiệm và Phân tích'),
-    h2('3.1. Xác định giá trị CUTOFF tối ưu (n = 100.000, dữ liệu ngẫu nhiên)'),
+    h2('3.1. Xác định giá trị CUTOFF tối ưu (N = 100.000, dữ liệu ngẫu nhiên)'),
 ]
 
 # Bang CUTOFF dang ngang
@@ -143,13 +142,13 @@ for r in [1, 3]:
             cutoff_table_data[r][c_idx] += ' *'
 
 story.append(tbl(cutoff_table_data, col_widths=[2.8*cm] + [1.8*cm]*7, font_size=8))
-story.append(sp(4))
-story += fig('report/figures/fig1_cutoff_vs_time.png', w_cm=11.5, h_cm=5.0,
-             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (n = 100.000, ngẫu nhiên, 5 lần lặp). Điểm tối ưu: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
+story.append(sp(3))
+story += fig('report/figures/fig1_cutoff_vs_time.png', w_cm=11.5, h_cm=4.6,
+             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (N = 100.000, ngẫu nhiên). Giá trị tối ưu: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
 
 story.append(h2(f'3.2. So sánh hiệu năng theo kích thước mảng (Dữ liệu ngẫu nhiên, CUTOFF = {best_cutoff})'))
 rand_df = summary_df[summary_df['type'] == 'random'].sort_values('size')
-size_data = [['Kích thước (n)', 'MergeSort (ms)', 'Optimized (ms)', 'Tốc độ cải thiện']]
+size_data = [['Kích thước (N)', 'MergeSort (ms)', 'Optimized (ms)', 'Tốc độ cải thiện']]
 for _, row in rand_df.iterrows():
     size_data.append([
         f"{int(row['size']):,}",
@@ -158,11 +157,11 @@ for _, row in rand_df.iterrows():
         f"{row['speedup_pct']:+.1f}%"
     ])
 story.append(tbl(size_data, col_widths=[4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm], font_size=8.5))
-story.append(sp(4))
-story += fig('report/figures/fig2_size_vs_time.png', w_cm=11.5, h_cm=5.0,
-             caption=f'Hình 2. Thời gian chạy của MergeSort và OptimizedMergeSort (CUTOFF = {best_cutoff}) theo kích thước mảng (dữ liệu ngẫu nhiên, 5 lần lặp).')
+story.append(sp(3))
+story += fig('report/figures/fig2_size_vs_time.png', w_cm=11.5, h_cm=4.6,
+             caption=f'Hình 2. Thời gian chạy của MergeSort và OptimizedMergeSort (CUTOFF = {best_cutoff}) theo kích thước mảng.')
 
-story.append(h2(f'3.3. Đánh giá hiệu năng trên 7 kiểu dữ liệu (n = 1.000.000, CUTOFF = {best_cutoff})'))
+story.append(h2(f'3.3. Đánh giá hiệu năng trên 7 kiểu dữ liệu (N = 1.000.000, CUTOFF = {best_cutoff})'))
 large_df = summary_df[summary_df['size'] == 1000000]
 type_names = {
     'random': 'Ngẫu nhiên (Random)',
@@ -182,18 +181,18 @@ for _, row in large_df.iterrows():
         f"{row['speedup_pct']:+.1f}%"
     ])
 story.append(tbl(dist_data, col_widths=[5.5*cm, 3.5*cm, 3.5*cm, 3.5*cm], font_size=8.5))
-story.append(sp(4))
-story += fig('report/figures/fig4_distribution.png', w_cm=12.2, h_cm=5.0,
-             caption=f'Hình 3. So sánh hiệu năng giữa hai thuật toán trên 7 kiểu dữ liệu đầu vào (n = 1.000.000, CUTOFF = {best_cutoff}, 5 lần lặp).')
+story.append(sp(3))
+story += fig('report/figures/fig4_distribution.png', w_cm=12.2, h_cm=4.8,
+             caption=f'Hình 3. So sánh hiệu năng giữa hai thuật toán trên 7 kiểu dữ liệu đầu vào (N = 1.000.000, CUTOFF = {best_cutoff}).')
 
 # ============================================================
 # 4. KET LUAN
 # ============================================================
 story += [
     h1('4. Nhận xét và Kết luận'),
-    p(f'1. <b>Lựa chọn CUTOFF = {best_cutoff}:</b> Thực nghiệm khảo sát xác định giá trị CUTOFF tối ưu là <b>{best_cutoff}</b> (đạt thời gian thấp nhất {best_time:.2f} ms). Vùng giá trị hiệu quả nằm trong khoảng 8 đến 16, phù hợp hoàn hảo với khuyến nghị của giáo trình Sedgewick. Do đó, mốc CUTOFF = {best_cutoff} được sử dụng đồng nhất cho toàn bộ các thí nghiệm so sánh tiếp theo.'),
-    p(f'2. <b>Ưu thế trên dữ liệu có thứ tự:</b> Với CUTOFF = {best_cutoff}, OptimizedMergeSort cho thấy hiệu quả vượt trội trên các tập dữ liệu gần sắp xếp: cải thiện <b>12.8%</b> trên dữ liệu đã sắp xếp, và từ <b>13.3% đến 15.8%</b> trên các bộ dữ liệu Partially Sorted (1%, 5%, 10%). Điều này chứng minh Insertion Sort phát huy tối đa lợi thế khi số nghịch thế (inversions) nhỏ.'),
-    p(f'3. <b>Kết luận:</b> Kỹ thuật CUTOFF = {best_cutoff} sang Insertion Sort là một cải tiến đơn giản nhưng mang lại hiệu quả thực tế rõ ràng, giúp thuật toán giảm đáng kể overhead đệ quy trên mảng lớn và dữ liệu có thứ tự bộ phận.'),
+    p(f'1. <b>Ngưỡng CUTOFF tối ưu:</b> Thực nghiệm xác định giá trị tối ưu là <b>CUTOFF = {best_cutoff}</b> ({best_time:.2f} ms). Vùng giá trị hiệu quả nằm trong khoảng 8 đến 16, phù hợp với khuyến nghị của giáo trình Sedgewick. Mốc CUTOFF = {best_cutoff} được áp dụng đồng nhất cho các so sánh diện rộng.'),
+    p(f'2. <b>Ưu thế trên dữ liệu có thứ tự bộ phận:</b> Với CUTOFF = {best_cutoff}, OptimizedMergeSort cải thiện từ <b>13.3% đến 15.8%</b> trên các bộ dữ liệu Partially Sorted (1%, 5%, 10%) và <b>12.8%</b> trên mảng đã sắp xếp. Điều này khẳng định Insertion Sort đạt hiệu quả tiệm cận O(N) khi số lượng nghịch thế nhỏ.'),
+    p(f'3. <b>Kết luận:</b> Cải tiến CUTOFF = {best_cutoff} mang lại hiệu năng thực tế rõ rệt, giảm tải đệ quy và tối ưu hóa bộ nhớ đệm CPU trên các tập dữ liệu quy mô lớn.'),
 ]
 
 doc.build(story)

@@ -5,17 +5,39 @@
 
 ---
 
-## Giới thiệu
+## 1. Giới thiệu và Bối cảnh Lý thuyết
 
-Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `CUTOFF`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. 
+Trong phân tích thuật toán, **Merge Sort** đạt độ phức tạp lý thuyết tối ưu là $O(N \log N)$ trong mọi trường hợp. Tuy nhiên, khi mảng con bị chia nhỏ đến kích thước rất bé ($N \le 1$), chi phí quản lý đệ quy (call stack) và thao tác sao chép sang mảng phụ `aux[]` tạo ra overhead đáng kể.
 
-Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne). Qua thực nghiệm khảo sát, giá trị **CUTOFF = 8** được xác định là mốc tối ưu nhất (18.41 ms) và được sử dụng đồng nhất trong toàn bộ các phân tích so sánh diện rộng.
+Kỹ thuật **CUTOFF** giải quyết vấn đề này bằng cách chuyển sang **Insertion Sort** khi kích thước đoạn con nhỏ hơn hoặc bằng một ngưỡng xác định ($hi \le lo + CUTOFF - 1$). Trong giáo trình kinh điển *Algorithms, 4th Edition*, GS. Robert Sedgewick từng đề xuất ngưỡng $CUTOFF = 7$ (ở các ấn bản cũ) và $CUTOFF = 10$ hoặc trong khoảng $8 \le CUTOFF \le 16$ (ở các ấn bản mới).
+
+Dự án này thực nghiệm khảo sát và xác định ngưỡng **CUTOFF tối ưu** trên môi trường phần cứng thực tế, đồng thời đối chiếu hiệu năng giữa thuật toán nguyên bản và thuật toán cải tiến trên **7 kiểu phân bố dữ liệu** với kích thước lên tới 1.000.000 phần tử.
 
 ---
 
-## 7 Kiểu dữ liệu thử nghiệm
+## 2. Đặc tả Môi trường Thực Nghiệm
 
-1. **Random**: Phân bố ngẫu nhiên đều.
+Toàn bộ các phép đo được thực hiện trực tiếp trên hệ thống phần cứng và phần mềm sau:
+* **Bộ xử lý (CPU):** 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz (4 Cores, 8 Threads)
+* **Bộ nhớ trong (RAM):** 8 GB
+* **Hệ điều hành:** Microsoft Windows 11 (64-bit)
+* **Môi trường Java:** OpenJDK 21.0.11 LTS
+* **Môi trường phân tích & vẽ biểu đồ:** Python 3.13 (Pandas, Matplotlib, ReportLab)
+
+---
+
+## 3. Phương pháp Thực Nghiệm (Algorithm Analysis)
+
+Để đảm bảo kết quả đo lường khách quan, chính xác và có tính tái lập (reproducibility), quy trình đo tuân thủ các nguyên tắc khoa học:
+1. **Khử sai số khởi động lạnh (JVM Warm-up):** Thực hiện các chu kỳ chạy mồi trước khi bấm giờ để trình biên dịch JIT (Just-In-Time) của JVM hoàn tất tối ưu mã máy.
+2. **Khử nhiễu Garbage Collection (Trimmed Mean):** Khi khảo sát CUTOFF, mỗi mốc được đo 7 lần độc lập. Sử dụng phương pháp *Trimmed Mean* (tự động loại bỏ 1 lần nhanh nhất và 1 lần chậm nhất do GC pause đột biến) để lấy giá trị trung bình 5 lần chạy ổn định ở giữa.
+3. **Tính tái lập:** Dữ liệu sinh bằng `java.util.Random` với seed cố định (`42` hoặc `123456`). Dữ liệu được sinh ngoài vùng đo thời gian, mỗi thuật toán nhận bản sao độc lập (`.clone()`).
+
+---
+
+## 4. 7 Kiểu dữ liệu thử nghiệm
+
+1. **Random**: Phân bố ngẫu nhiên đều các số nguyên.
 2. **Sorted**: Đã sắp xếp tăng dần hoàn toàn.
 3. **Reversed**: Đã sắp xếp giảm dần (ngược chiều).
 4. **Duplicates**: Chứa nhiều phần tử trùng lặp (chỉ 100 giá trị khác nhau).
@@ -25,7 +47,7 @@ Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4t
 
 ---
 
-## Cấu trúc thư mục
+## 5. Cấu trúc Thư mục
 
 ```
 optimized-merge-sort/
@@ -53,26 +75,27 @@ optimized-merge-sort/
 
 ---
 
-## Hướng dẫn chạy
+## 6. Hướng dẫn chạy
 
-### 1. Biên dịch
+### Bước 1: Biên dịch toàn bộ mã nguồn
 ```bash
 mkdir bin
 javac -d bin src/InsertionSort.java src/MergeSort.java src/OptimizedMergeSort.java src/SortTest.java
 javac -d bin -cp bin benchmark/BenchmarkRunner.java
 ```
 
-### 2. Chạy kiểm tra tính đúng đắn (22 test case)
+### Bước 2: Chạy kiểm tra tính đúng đắn (22 test case)
 ```bash
 java -cp bin SortTest
 ```
 
-### 3. Chạy benchmark đo thời gian (7 bộ dữ liệu)
+### Bước 3: Chạy benchmark đo thời gian (7 bộ dữ liệu)
 ```bash
 java -cp bin BenchmarkRunner
 ```
+Kết quả đo sẽ tự động được lưu vào thư mục `results/`.
 
-### 4. Tạo biểu đồ và báo cáo PDF
+### Bước 4: Tạo biểu đồ và báo cáo PDF
 ```bash
 python report/plot_charts.py
 python report/generate_report.py
@@ -80,15 +103,16 @@ python report/generate_report.py
 
 ---
 
-## Kết quả thực nghiệm chính
+## 7. Kết quả thực nghiệm chính
 
-### 1. Khảo sát CUTOFF tối ưu (n = 100.000, ngẫu nhiên)
-* Vùng CUTOFF hiệu quả nhất: **8 – 16**. Giá trị đạt thời gian thấp nhất là **CUTOFF = 8** (18.41 ms), được chọn làm chuẩn tối ưu cho thuật toán cải tiến trong toàn bộ bài toán.
+### 7.1. Khảo sát CUTOFF tối ưu ($N = 100.000$, ngẫu nhiên)
+* Thực nghiệm đo đạc từ $CUTOFF = 1$ đến $64$.
+* Vùng CUTOFF hiệu quả nhất rơi vào khoảng **8 – 16**. Điểm tối ưu đạt tại **`CUTOFF = 8`** (18.41 ms), được chọn làm mốc chuẩn mực đồng nhất cho các bài so sánh diện rộng.
 
-### 2. Hiệu năng theo kiểu dữ liệu (n = 1.000.000, CUTOFF = 8)
+### 7.2. Hiệu năng theo kiểu dữ liệu ($N = 1.000.000$, CUTOFF = 8)
 
 | Kiểu dữ liệu | MergeSort (ms) | Optimized (ms) | Cải thiện (%) |
-|---|---|---|---|
+|---|:---:|:---:|:---:|
 | **Gần sắp xếp (5%)** | 422.42 | 355.87 | **+15.8%** |
 | **Gần sắp xếp (1%)** | 365.07 | 314.65 | **+13.8%** |
 | **Gần sắp xếp (10%)** | 499.11 | 432.68 | **+13.3%** |
@@ -96,5 +120,10 @@ python report/generate_report.py
 | **Trùng lặp (Duplicates)** | 342.37 | 304.99 | **+10.9%** |
 | **Ngẫu nhiên (Random)** | 517.35 | 488.79 | **+5.5%** |
 | **Ngược chiều (Reversed)** | 349.89 | 360.06 | -2.9% |
+
+### 7.3. Kết luận chính
+1. **Hiệu quả rõ rệt trên mảng lớn:** Việc tích hợp CUTOFF = 8 giúp tiết kiệm từ 28 ms đến 66 ms trên mảng 1 triệu phần tử, giảm đáng kể chi phí cấp phát và đệ quy.
+2. **Ưu thế vượt trội trên dữ liệu có thứ tự bộ phận:** Trên các tập dữ liệu Partially Sorted (1%, 5%, 10%), thuật toán cải tiến chạy nhanh hơn từ **13% đến 16%**, do Insertion Sort đạt hiệu năng tiệm cận $O(N)$ khi số nghịch thế ít.
+3. **Tính ứng dụng thực tế:** Kỹ thuật CUTOFF là một cải tiến chi phí thấp nhưng mang lại giá trị thực tiễn cao, hoàn toàn phù hợp để tích hợp vào các thư viện sắp xếp chuẩn.
 
 > Toàn bộ phân tích lý thuyết, bảng số liệu và 3 hình minh họa được trình bày trong file `report/BAO_CAO.pdf`.
