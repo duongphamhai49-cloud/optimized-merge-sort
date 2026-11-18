@@ -210,3 +210,4 @@ python report/generate_pdf_report_vi.py
 Hoặc chạy trực tiếp các file script tự động:
 - `benchmark\scripts\run_tests.bat`
 - `benchmark\scripts\run_benchmark.bat`
+

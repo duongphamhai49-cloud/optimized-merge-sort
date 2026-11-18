@@ -4,14 +4,14 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Comprehensive Correctness and Unit Tests for:
- * - InsertionSort (full array and range [lo..hi])
- * - Standard MergeSort
- * - OptimizedMergeSort across diverse cutoff thresholds
+ * Bộ kiểm thử tính đúng đắn toàn diện (Unit Correctness Tests):
+ * - InsertionSort (toàn mảng và đoạn con [lo..hi])
+ * - MergeSort chuẩn
+ * - OptimizedMergeSort trên đa dạng các ngưỡng cutoff
  * 
- * Verifies correctness against java.util.Arrays.sort() oracle.
- * Tests edge cases: empty, single-element, all duplicates, negative numbers,
- * already-sorted, reverse-sorted, random, cutoff boundaries, and stability.
+ * Đối chứng tính đúng đắn với oracle java.util.Arrays.sort().
+ * Kiểm tra các trường hợp biên: mảng rỗng, 1 phần tử, trùng lặp hoàn toàn, số âm,
+ * đã sắp xếp, nghịch đảo, ngẫu nhiên, các biên cutoff và tính ổn định (stability).
  */
 public class SortCorrectnessTest {
 
@@ -20,15 +20,15 @@ public class SortCorrectnessTest {
 
     public static void main(String[] args) {
         System.out.println("=================================================================");
-        System.out.println("  RUNNING COMPREHENSIVE CORRECTNESS TESTS FOR MERGE SORT SUITE   ");
+        System.out.println("  BẮT ĐẦU CHẠY BỘ KIỂM THỬ ĐÚNG ĐẮN TOÀN DIỆN CHO MERGE SORT     ");
         System.out.println("=================================================================");
 
-        // 1. Edge Case Tests
+        // 1. Kiểm thử trường hợp biên
         testEmptyArray();
         testSingleElementArray();
         testTwoElementArrays();
 
-        // 2. Data Characteristic Tests
+        // 2. Kiểm thử đặc tính dữ liệu
         testAlreadySortedArray();
         testReverseSortedArray();
         testAllIdenticalElements();
@@ -36,24 +36,24 @@ public class SortCorrectnessTest {
         testNegativeValues();
         testInterleavedValues();
 
-        // 3. Cutoff Boundary Tests
+        // 3. Kiểm thử các ngưỡng biên Cutoff
         testCutoffBoundaryConditions();
 
-        // 4. Randomized Oracle Verification
+        // 4. Đối chứng ngẫu nhiên với Oracle Arrays.sort()
         testRandomArraysAgainstOracle();
 
-        // 5. Insertion Sort Subarray Range Tests
+        // 5. Kiểm thử sắp xếp đoạn con Insertion Sort
         testInsertionSortSubarray();
 
-        // 6. Stability Tests
+        // 6. Kiểm thử tính ổn định (Stability)
         testStability();
 
         System.out.println("=================================================================");
-        System.out.printf("  TEST SUMMARY: %d / %d tests passed successfully!%n", testsPassed, testsRun);
+        System.out.printf("  TỔNG KẾT KIỂM THỬ: %d / %d bài test VƯỢT QUA thành công!%n", testsPassed, testsRun);
         System.out.println("=================================================================");
 
         if (testsPassed != testsRun) {
-            System.err.println("SOME TESTS FAILED!");
+            System.err.println("CÓ BÀI TEST BỊ THẤT BẠI!");
             System.exit(1);
         }
     }
@@ -62,10 +62,10 @@ public class SortCorrectnessTest {
         testsRun++;
         if (condition) {
             testsPassed++;
-            System.out.printf("  [PASS] %s%n", testName);
+            System.out.printf("  [PASS - ĐẠT] %s%n", testName);
         } else {
-            System.err.printf("  [FAIL] %s%n", testName);
-            throw new AssertionError("Test failed: " + testName);
+            System.err.printf("  [FAIL - LỖI] %s%n", testName);
+            throw new AssertionError("Kiểm thử thất bại: " + testName);
         }
     }
 
@@ -78,9 +78,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(a2);
         OptimizedMergeSort.sort(a3, 10);
 
-        assertTrue("Empty array - InsertionSort", a1.length == 0);
-        assertTrue("Empty array - MergeSort", a2.length == 0);
-        assertTrue("Empty array - OptimizedMergeSort", a3.length == 0);
+        assertTrue("Mảng rỗng - InsertionSort", a1.length == 0);
+        assertTrue("Mảng rỗng - MergeSort", a2.length == 0);
+        assertTrue("Mảng rỗng - OptimizedMergeSort", a3.length == 0);
     }
 
     private static void testSingleElementArray() {
@@ -92,9 +92,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(a2);
         OptimizedMergeSort.sort(a3, 10);
 
-        assertTrue("Single element - InsertionSort", a1[0] == 42);
-        assertTrue("Single element - MergeSort", a2[0] == 42);
-        assertTrue("Single element - OptimizedMergeSort", a3[0] == 42);
+        assertTrue("Mảng 1 phần tử - InsertionSort", a1[0] == 42);
+        assertTrue("Mảng 1 phần tử - MergeSort", a2[0] == 42);
+        assertTrue("Mảng 1 phần tử - OptimizedMergeSort", a3[0] == 42);
     }
 
     private static void testTwoElementArrays() {
@@ -109,9 +109,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 2);
 
-        assertTrue("Two elements inverted - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("Two elements inverted - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("Two elements inverted - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng 2 phần tử nghịch đảo - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng 2 phần tử nghịch đảo - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng 2 phần tử nghịch đảo - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testAlreadySortedArray() {
@@ -126,9 +126,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 4);
 
-        assertTrue("Already sorted - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("Already sorted - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("Already sorted - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng đã sắp xếp - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng đã sắp xếp - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng đã sắp xếp - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testReverseSortedArray() {
@@ -143,9 +143,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 4);
 
-        assertTrue("Reverse sorted - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("Reverse sorted - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("Reverse sorted - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng nghịch đảo hoàn toàn - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng nghịch đảo hoàn toàn - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng nghịch đảo hoàn toàn - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testAllIdenticalElements() {
@@ -160,9 +160,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 4);
 
-        assertTrue("All identical elements - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("All identical elements - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("All identical elements - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng toàn bộ phần tử giống nhau - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng toàn bộ phần tử giống nhau - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng toàn bộ phần tử giống nhau - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testManyDuplicates() {
@@ -178,9 +178,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 5);
 
-        assertTrue("Many duplicates - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("Many duplicates - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("Many duplicates - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng nhiều phần tử trùng lặp - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng nhiều phần tử trùng lặp - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng nhiều phần tử trùng lặp - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testNegativeValues() {
@@ -196,9 +196,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 3);
 
-        assertTrue("Negative values - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("Negative values - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("Negative values - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng chứa số âm và số không - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng chứa số âm và số không - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng chứa số âm và số không - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testInterleavedValues() {
@@ -214,9 +214,9 @@ public class SortCorrectnessTest {
         MergeSort.sort(c2);
         OptimizedMergeSort.sort(c3, 4);
 
-        assertTrue("Interleaved values - InsertionSort", Arrays.equals(c1, exp));
-        assertTrue("Interleaved values - MergeSort", Arrays.equals(c2, exp));
-        assertTrue("Interleaved values - OptimizedMergeSort", Arrays.equals(c3, exp));
+        assertTrue("Mảng số âm dương đan xen - InsertionSort", Arrays.equals(c1, exp));
+        assertTrue("Mảng số âm dương đan xen - MergeSort", Arrays.equals(c2, exp));
+        assertTrue("Mảng số âm dương đan xen - OptimizedMergeSort", Arrays.equals(c3, exp));
     }
 
     private static void testCutoffBoundaryConditions() {
@@ -234,7 +234,7 @@ public class SortCorrectnessTest {
         for (int cutoff : cutoffs) {
             Integer[] copy = original.clone();
             OptimizedMergeSort.sort(copy, cutoff);
-            assertTrue("Cutoff boundary test (cutoff=" + cutoff + ")", Arrays.equals(copy, expected));
+            assertTrue("Kiểm thử biên Cutoff (cutoff=" + cutoff + ")", Arrays.equals(copy, expected));
         }
     }
 
@@ -253,28 +253,28 @@ public class SortCorrectnessTest {
 
             Integer[] mergeCopy = original.clone();
             MergeSort.sort(mergeCopy);
-            assertTrue("MergeSort random array size " + size, Arrays.equals(mergeCopy, expected));
+            assertTrue("MergeSort mảng ngẫu nhiên kích thước " + size, Arrays.equals(mergeCopy, expected));
 
             Integer[] optCopyDefault = original.clone();
             OptimizedMergeSort.sort(optCopyDefault);
-            assertTrue("OptimizedMergeSort default cutoff size " + size, Arrays.equals(optCopyDefault, expected));
+            assertTrue("OptimizedMergeSort cutoff mặc định kích thước " + size, Arrays.equals(optCopyDefault, expected));
 
             Integer[] optCopyCustom = original.clone();
             OptimizedMergeSort.sort(optCopyCustom, 16);
-            assertTrue("OptimizedMergeSort cutoff 16 size " + size, Arrays.equals(optCopyCustom, expected));
+            assertTrue("OptimizedMergeSort cutoff 16 kích thước " + size, Arrays.equals(optCopyCustom, expected));
         }
     }
 
     private static void testInsertionSortSubarray() {
         Integer[] arr = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
-        // Sort subarray index 2 to 6: elements {7, 6, 5, 4, 3} -> should become {3, 4, 5, 6, 7}
+        // Sắp xếp đoạn con từ chỉ số 2 đến 6
         InsertionSort.sort(arr, 2, 6);
         Integer[] expected = {9, 8, 3, 4, 5, 6, 7, 2, 1, 0};
-        assertTrue("InsertionSort subarray [2..6]", Arrays.equals(arr, expected));
+        assertTrue("InsertionSort trên đoạn con [2..6]", Arrays.equals(arr, expected));
     }
 
     /**
-     * Verifies stability: items with equal primary keys must retain original relative ordering.
+     * Kiểm thử tính ổn định (Stability): các phần tử có khóa bằng nhau phải giữ nguyên thứ tự ban đầu.
      */
     private static void testStability() {
         class Element implements Comparable<Element> {
@@ -305,14 +305,14 @@ public class SortCorrectnessTest {
         Element[] copy = items.clone();
         OptimizedMergeSort.sort(copy, 4);
 
-        // Verify key ordering
+        // Kiểm tra các khóa có được sắp xếp không
         boolean keySorted = true;
         for (int i = 1; i < copy.length; i++) {
             if (copy[i].key < copy[i - 1].key) keySorted = false;
         }
-        assertTrue("Stability - Keys sorted", keySorted);
+        assertTrue("Tính ổn định - Khóa chính được sắp xếp", keySorted);
 
-        // Verify stability: for key == 1, original indices should be 2, 4, 7 in order
+        // Kiểm tra tính ổn định: với key == 1, thứ tự ban đầu phải là 2, 4, 7
         int lastIdx1 = -1;
         boolean stable1 = true;
         for (Element e : copy) {
@@ -321,6 +321,6 @@ public class SortCorrectnessTest {
                 lastIdx1 = e.originalIndex;
             }
         }
-        assertTrue("Stability - Key 1 relative order preserved", stable1);
+        assertTrue("Tính ổn định - Thứ tự tương đối của các phần tử bằng nhau được bảo toàn", stable1);
     }
 }

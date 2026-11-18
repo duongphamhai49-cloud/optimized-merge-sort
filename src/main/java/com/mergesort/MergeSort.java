@@ -1,27 +1,28 @@
 package com.mergesort;
 
 /**
- * Standard Merge Sort implementation strictly adhering to the lecture materials
- * from Algorithms 4th Edition (Robert Sedgewick & Kevin Wayne), lecture slides 229-230.
+ * Cài đặt thuật toán Sắp xếp trộn chuẩn (Standard Merge Sort) tuân thủ chặt chẽ
+ * slide bài giảng môn học và giáo trình Algorithms 4th Edition (Sedgewick & Wayne),
+ * slide 229-230.
  * 
- * Features:
- * - Single auxiliary array allocation prior to recursion to avoid memory thrashing.
- * - In-place merge abstraction with left pointer i and right pointer j.
- * - Classic divide-and-conquer recursive structure with midpoint calculation.
+ * Đặc điểm kỹ thuật:
+ * - Cấp phát mảng phụ aux[] đúng một lần duy nhất ở hàm ngoài cùng.
+ * - Quy trình trộn tại chỗ (in-place merge abstraction) với hai con trỏ i và j.
+ * - Phân chia mảng theo phương pháp chia để trị đệ quy với điểm giữa mid.
  */
 public class MergeSort {
 
     /**
-     * Merges two sorted subarrays a[lo..mid] and a[mid+1..hi] using auxiliary array aux[].
-     * Exactly reproduces slide 229 merge procedure.
+     * Trộn hai nửa đã sắp xếp a[lo..mid] và a[mid+1..hi] bằng mảng phụ aux[].
+     * Tái hiện chính xác mã nguồn slide 229.
      */
     private static void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi) {
-        // Copy to auxiliary array aux[]
+        // Sao chép sang mảng phụ aux[]
         for (int k = lo; k <= hi; k++) {
             aux[k] = a[k];
         }
 
-        // Merge back to a[]
+        // Trộn ngược lại vào mảng chính a[]
         int i = lo, j = mid + 1;
         for (int k = lo; k <= hi; k++) {
             if      (i > mid)               a[k] = aux[j++];
@@ -32,8 +33,8 @@ public class MergeSort {
     }
 
     /**
-     * Recursive sort helper dividing the range and merging.
-     * Slide 230 implementation.
+     * Hàm sắp xếp đệ quy chia đôi mảng và trộn.
+     * Tái hiện chính xác mã nguồn slide 230.
      */
     private static void sort(Comparable[] a, Comparable[] aux, int lo, int hi) {
         if (hi <= lo) return;
@@ -44,10 +45,10 @@ public class MergeSort {
     }
 
     /**
-     * Sorts the array using standard Merge Sort.
-     * Allocates auxiliary array once.
+     * Phương thức public sắp xếp mảng bằng Merge Sort chuẩn.
+     * Cấp phát mảng phụ aux[] một lần duy nhất để tối ưu hiệu năng.
      *
-     * @param a the array of Comparable elements to sort
+     * @param a mảng các đối tượng Comparable cần sắp xếp
      */
     public static void sort(Comparable[] a) {
         if (a == null || a.length <= 1) {
@@ -58,7 +59,7 @@ public class MergeSort {
     }
 
     /**
-     * Helper comparison method: returns true if v < w.
+     * Hàm so sánh phụ trợ: trả về true nếu v < w.
      */
     private static boolean less(Comparable v, Comparable w) {
         return v.compareTo(w) < 0;

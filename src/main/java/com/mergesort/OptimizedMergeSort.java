@@ -1,31 +1,31 @@
 package com.mergesort;
 
 /**
- * Optimized Merge Sort with small subarray cutoff optimization,
- * based on Algorithms 4th Edition (Robert Sedgewick & Kevin Wayne), slide 238.
+ * Cài đặt thuật toán Sắp xếp trộn cải tiến (Optimized Merge Sort) với ngưỡng CUTOFF
+ * chuyển đổi sang Insertion Sort cho các mảng con kích thước nhỏ, bám sát slide 238
+ * giáo trình Algorithms 4th Edition (Robert Sedgewick & Kevin Wayne).
  * 
- * When subarray length <= cutoff (i.e. hi <= lo + cutoff - 1),
- * the algorithm switches directly to Insertion Sort, bypassing recursive function call overhead
- * and auxiliary array copy overhead on tiny subarrays.
+ * Khi kích thước mảng con <= cutoff (hi <= lo + cutoff - 1), giải thuật chuyển trực tiếp
+ * sang Insertion Sort, triệt tiêu chi phí gọi hàm đệ quy và sao chép mảng phụ trên các đoạn mảng nhỏ.
  */
 public class OptimizedMergeSort {
 
     /**
-     * Default cutoff threshold recommended in modern editions of Algorithms 4th Edition.
+     * Ngưỡng Cutoff mặc định được khuyến nghị trong ấn bản mới của giáo trình.
      */
     public static final int DEFAULT_CUTOFF = 10;
 
     /**
-     * Merges two sorted subarrays a[lo..mid] and a[mid+1..hi] using auxiliary array aux[].
-     * Preserves the lecture-based merge procedure from slide 229.
+     * Trộn hai nửa đã sắp xếp a[lo..mid] và a[mid+1..hi] bằng mảng phụ aux[].
+     * Giữ nguyên quy trình trộn chuẩn theo slide 229.
      */
     private static void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi) {
-        // Copy to auxiliary array aux[]
+        // Sao chép sang mảng phụ aux[]
         for (int k = lo; k <= hi; k++) {
             aux[k] = a[k];
         }
 
-        // Merge back to a[]
+        // Trộn vào mảng chính a[]
         int i = lo, j = mid + 1;
         for (int k = lo; k <= hi; k++) {
             if      (i > mid)               a[k] = aux[j++];
@@ -36,15 +36,15 @@ public class OptimizedMergeSort {
     }
 
     /**
-     * Recursive sort helper with cutoff threshold.
-     * Slide 238 implementation:
+     * Hàm sắp xếp đệ quy tích hợp ngưỡng Cutoff.
+     * Cài đặt bám sát slide 238:
      * if (hi <= lo + CUTOFF - 1) {
      *     Insertion.sort(a, lo, hi);
      *     return;
      * }
      */
     private static void sort(Comparable[] a, Comparable[] aux, int lo, int hi, int cutoff) {
-        // Cutoff optimization: for subarrays of length <= cutoff, switch to Insertion Sort
+        // Cải tiến Cutoff: Nếu độ dài mảng con <= cutoff, dùng Insertion Sort
         if (hi <= lo + cutoff - 1) {
             InsertionSort.sort(a, lo, hi);
             return;
@@ -57,32 +57,31 @@ public class OptimizedMergeSort {
     }
 
     /**
-     * Sorts array with a specified cutoff threshold.
+     * Sắp xếp mảng với ngưỡng Cutoff tùy chọn.
      *
-     * @param a      the array of Comparable elements
-     * @param cutoff the subarray length threshold below which Insertion Sort is used
+     * @param a      mảng cần sắp xếp
+     * @param cutoff ngưỡng chuyển đổi sang Insertion Sort
      */
     public static void sort(Comparable[] a, int cutoff) {
         if (a == null || a.length <= 1) {
             return;
         }
-        // If cutoff < 1, fall back to standard cutoff = 1 (standard base case: length <= 1)
         int effectiveCutoff = Math.max(1, cutoff);
         Comparable[] aux = new Comparable[a.length];
         sort(a, aux, 0, a.length - 1, effectiveCutoff);
     }
 
     /**
-     * Sorts array with default cutoff threshold (10).
+     * Sắp xếp mảng với ngưỡng Cutoff mặc định (10).
      *
-     * @param a the array of Comparable elements
+     * @param a mảng cần sắp xếp
      */
     public static void sort(Comparable[] a) {
         sort(a, DEFAULT_CUTOFF);
     }
 
     /**
-     * Helper comparison method: returns true if v < w.
+     * Hàm so sánh phụ trợ: trả về true nếu v < w.
      */
     private static boolean less(Comparable v, Comparable w) {
         return v.compareTo(w) < 0;

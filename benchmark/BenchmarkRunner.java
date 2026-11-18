@@ -10,14 +10,15 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
- * BenchmarkRunner executes empirical measurements of MergeSort vs OptimizedMergeSort.
+ * BenchmarkRunner thực hiện đo đạc và phân tích thực nghiệm thuật toán (Algorithm Analysis).
+ * So sánh giữa MergeSort chuẩn và MergeSort cải tiến Cutoff.
  * 
- * Adheres to rigorous empirical benchmarking methodology:
- * 1. Warm-up phase to eliminate JVM cold-start and JIT compilation jitter.
- * 2. High-precision timing via System.nanoTime().
- * 3. Fresh array cloned for each trial, data generation excluded from timing.
- * 4. Outside-timing verification of sorting correctness.
- * 5. Full preservation of raw trial data and aggregated statistics.
+ * Tuân thủ phương pháp luận thực nghiệm khoa học nghiêm ngặt:
+ * 1. Làm nóng máy ảo (JVM Warm-up) để khử sai số khởi động lạnh và ổn định JIT compiler.
+ * 2. Đo đạc chính xác bằng System.nanoTime().
+ * 3. Cấp phát mảng mới cho từng lượt chạy; loại bỏ thao tác sinh dữ liệu khỏi vùng bấm giờ.
+ * 4. Kiểm tra tính đúng đắn bên ngoài vùng bấm giờ.
+ * 5. Lưu trữ toàn bộ 3.000 phép đo thô và thống kê tổng hợp.
  */
 public class BenchmarkRunner {
 
@@ -25,13 +26,13 @@ public class BenchmarkRunner {
     private static final int WARMUP_ITERATIONS = 8;
     private static final int WARMUP_SIZE = 50_000;
 
-    // Tested cutoff thresholds specified by academic assignment
+    // Dải giá trị CUTOFF khảo sát theo yêu cầu đề bài
     public static final int[] CUTOFFS = { 1, 2, 4, 6, 7, 8, 10, 12, 16, 20, 24, 32, 48, 64 };
 
-    // Tested input sizes
+    // Kích thước mảng N thử nghiệm
     public static final int[] SIZES = { 1_000, 10_000, 100_000, 500_000, 1_000_000 };
 
-    // Tested distributions
+    // Các dạng phân bố dữ liệu
     public static final DatasetGenerator.Distribution[] DISTRIBUTIONS = {
         DatasetGenerator.Distribution.RANDOM,
         DatasetGenerator.Distribution.SORTED,
@@ -41,8 +42,8 @@ public class BenchmarkRunner {
 
     public static void main(String[] args) {
         System.out.println("==========================================================================");
-        System.out.println("  EMPIRICAL BENCHMARK: MERGE SORT CUTOFF OPTIMIZATION EVALUATION         ");
-        System.out.println("  Algorithms 4th Edition (Sedgewick & Wayne) Foundation                  ");
+        System.out.println("  THỰC NGHIỆM ĐO ĐẠC VÀ ĐÁNH GIÁ NGƯỠNG CUTOFF TỐI ƯU CHO MERGESORT      ");
+        System.out.println("  Dựa trên nền tảng giáo trình Algorithms 4th Edition (Sedgewick & Wayne) ");
         System.out.println("==========================================================================");
 
         File resultsDir = new File("data/results");
@@ -53,17 +54,17 @@ public class BenchmarkRunner {
         File rawCsvFile = new File(resultsDir, "raw_benchmark_results.csv");
         File summaryCsvFile = new File(resultsDir, "summary_statistics.csv");
 
-        // Warm-up JVM
-        System.out.println("\n[Phase 1] Performing JVM JIT warm-up (" + WARMUP_ITERATIONS + " iterations)...");
+        // Làm nóng JVM
+        System.out.println("\n[Giai đoạn 1] Đang khởi động làm nóng JVM (" + WARMUP_ITERATIONS + " vòng lặp mồi)...");
         performWarmUp();
-        System.out.println("[Phase 1] JVM Warm-up complete. Steady-state compilation reached.\n");
+        System.out.println("[Giai đoạn 1] Khởi động JVM hoàn tất. JIT Compiler đã đạt trạng thái ổn định.\n");
 
-        System.out.println("[Phase 2] Executing rigorous benchmark matrix...");
+        System.out.println("[Giai đoạn 2] Bắt đầu thực thi ma trận đo đạc thực nghiệm...");
 
         try (PrintWriter rawWriter = new PrintWriter(new FileWriter(rawCsvFile));
              PrintWriter summaryWriter = new PrintWriter(new FileWriter(summaryCsvFile))) {
 
-            // CSV Headers
+            // Header CSV
             rawWriter.println("RunId,Size,Distribution,Algorithm,Cutoff,Trial,TimeNs,TimeMs");
             summaryWriter.println("Size,Distribution,Algorithm,Cutoff,Trials,MeanMs,MedianMs,StdDevMs,MinMs,MaxMs");
 
@@ -71,23 +72,23 @@ public class BenchmarkRunner {
 
             for (DatasetGenerator.Distribution dist : DISTRIBUTIONS) {
                 System.out.println("\n==========================================================================");
-                System.out.printf("  DISTRIBUTION: %-15s (Trials per config: %d)%n", dist, TRIALS);
+                System.out.printf("  DẠNG PHÂN BỐ: %-15s (Số lần lặp mỗi cấu hình: %d)%n", dist, TRIALS);
                 System.out.println("==========================================================================");
 
                 for (int size : SIZES) {
-                    System.out.printf("%n--- Size N = %,d (%s) ---%n", size, dist);
+                    System.out.printf("%n--- Kích thước N = %,d (%s) ---%n", size, dist);
                     System.out.printf("%-18s | %-8s | %-12s | %-12s | %-12s | %-12s%n",
-                            "Algorithm", "Cutoff", "Mean (ms)", "Median (ms)", "StdDev (ms)", "Min (ms)");
+                            "Thuật toán", "CUTOFF", "TB (ms)", "Trung vị (ms)", "Độ lệch (ms)", "Nhỏ nhất (ms)");
                     System.out.println("--------------------------------------------------------------------------------");
 
-                    // 1. Standard MergeSort baseline (Cutoff 0)
+                    // 1. MergeSort chuẩn làm mốc đối chứng
                     BenchmarkStats stdStats = runBenchmark(size, dist, 0, false, rawWriter, runId);
                     runId += TRIALS;
                     System.out.printf("%-18s | %-8s | %-12.4f | %-12.4f | %-12.4f | %-12.4f%n",
-                            "Standard Merge", "N/A", stdStats.mean, stdStats.median, stdStats.stdDev, stdStats.min);
+                            "MergeSort chuẩn", "Không", stdStats.mean, stdStats.median, stdStats.stdDev, stdStats.min);
                     writeSummary(summaryWriter, size, dist.name(), "StandardMergeSort", 0, stdStats);
 
-                    // 2. Optimized MergeSort across all cutoff thresholds
+                    // 2. MergeSort cải tiến trên tất cả các ngưỡng Cutoff
                     for (int cutoff : CUTOFFS) {
                         BenchmarkStats optStats = runBenchmark(size, dist, cutoff, true, rawWriter, runId);
                         runId += TRIALS;
@@ -96,11 +97,9 @@ public class BenchmarkRunner {
                         writeSummary(summaryWriter, size, dist.name(), "OptimizedMergeSort", cutoff, optStats);
                     }
 
-                    // Flush results after each size configuration
                     rawWriter.flush();
                     summaryWriter.flush();
 
-                    // Hint GC to avoid mid-measurement collection
                     System.gc();
                     try {
                         Thread.sleep(50);
@@ -109,13 +108,13 @@ public class BenchmarkRunner {
             }
 
             System.out.println("\n==========================================================================");
-            System.out.println("  BENCHMARK EXECUTION COMPLETED SUCCESSFULLY!                            ");
-            System.out.println("  Raw results preserved in:     " + rawCsvFile.getAbsolutePath());
-            System.out.println("  Summary statistics stored in: " + summaryCsvFile.getAbsolutePath());
+            System.out.println("  THỰC NGHIỆM ĐO ĐẠC HOÀN THÀNH XUẤT SẮC!                                ");
+            System.out.println("  Dữ liệu thô được lưu tại:        " + rawCsvFile.getAbsolutePath());
+            System.out.println("  Thống kê tổng hợp được lưu tại:  " + summaryCsvFile.getAbsolutePath());
             System.out.println("==========================================================================");
 
         } catch (IOException e) {
-            System.err.println("Fatal error during benchmark execution: " + e.getMessage());
+            System.err.println("Lỗi nghiêm trọng trong quá trình đo đạc: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -128,12 +127,11 @@ public class BenchmarkRunner {
         String algoName = isOptimized ? "OptimizedMergeSort" : "StandardMergeSort";
 
         for (int t = 0; t < TRIALS; t++) {
-            // Generate deterministic input using fixed seed per trial
             long seed = 100_000L * (t + 1) + size;
             Integer[] original = DatasetGenerator.generate(size, dist, seed);
             Integer[] copy = Arrays.copyOf(original, original.length);
 
-            // TIMED EXECUTION REGION
+            // VÙNG ĐO THỜI GIAN ĐỘC LẬP
             long start = System.nanoTime();
             if (isOptimized) {
                 OptimizedMergeSort.sort(copy, cutoff);
@@ -141,18 +139,16 @@ public class BenchmarkRunner {
                 MergeSort.sort(copy);
             }
             long elapsedNs = System.nanoTime() - start;
-            // END TIMED EXECUTION REGION
+            // KẾT THÚC VÙNG ĐO THỜI GIAN
 
-            // Verify correctness outside timed region
             if (!isSorted(copy)) {
-                throw new IllegalStateException("Algorithm failed to sort correctly! Size: " + size +
-                        ", Cutoff: " + cutoff + ", Distribution: " + dist);
+                throw new IllegalStateException("Thuật toán sắp xếp sai! Kích thước: " + size +
+                        ", Cutoff: " + cutoff + ", Dạng: " + dist);
             }
 
             timesNs[t] = elapsedNs;
             timesMs[t] = elapsedNs / 1_000_000.0;
 
-            // Record raw measurement
             rawWriter.printf("%d,%d,%s,%s,%d,%d,%d,%.6f%n",
                     (startRunId + t), size, dist.name(), algoName, cutoff, (t + 1), elapsedNs, timesMs[t]);
         }

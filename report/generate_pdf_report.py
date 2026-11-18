@@ -9,11 +9,23 @@ from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, KeepTogether, HRFlowable
 )
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
-class NumberedCanvas(canvas.Canvas):
+# Đăng ký font TrueType Unicode tiếng Việt (Times New Roman & Consolas)
+FONT_DIR = r"C:\Windows\Fonts"
+pdfmetrics.registerFont(TTFont("VN-Times", os.path.join(FONT_DIR, "times.ttf")))
+pdfmetrics.registerFont(TTFont("VN-Times-Bold", os.path.join(FONT_DIR, "timesbd.ttf")))
+pdfmetrics.registerFont(TTFont("VN-Times-Italic", os.path.join(FONT_DIR, "timesi.ttf")))
+pdfmetrics.registerFont(TTFont("VN-Times-BoldItalic", os.path.join(FONT_DIR, "timesbi.ttf")))
+if os.path.exists(os.path.join(FONT_DIR, "consola.ttf")):
+    pdfmetrics.registerFont(TTFont("VN-Code", os.path.join(FONT_DIR, "consola.ttf")))
+else:
+    pdfmetrics.registerFont(TTFont("VN-Code", os.path.join(FONT_DIR, "times.ttf")))
+
+class VietnameseNumberedCanvas(canvas.Canvas):
     """
-    Two-pass canvas to dynamically compute and render total page count
-    along with academic running headers and footers in strict monochrome.
+    Two-pass canvas hỗ trợ đánh số trang tự động và header/footer tiếng Việt đơn sắc.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -33,35 +45,35 @@ class NumberedCanvas(canvas.Canvas):
 
     def draw_page_decorations(self, page_count):
         self.saveState()
-        self.setFont("Times-Roman", 9)
+        self.setFont("VN-Times", 9)
         self.setStrokeColor(colors.black)
         self.setFillColor(colors.black)
         self.setLineWidth(0.5)
 
         width, height = self._pagesize
 
-        # Running Header (pages > 1)
+        # Running Header (từ trang 2 trở đi)
         if self._pageNumber > 1:
-            self.drawString(54, height - 36, "Empirical Evaluation of Merge Sort Cutoff Optimization — Algorithms 4th Edition")
+            self.drawString(54, height - 36, "Báo Cáo Nghiên Cứu Thực Nghiệm: Tối Ưu Hóa Thuật Toán MergeSort với Ngưỡng Cutoff")
             self.line(54, height - 42, width - 54, height - 42)
 
-        # Running Footer (all pages)
+        # Running Footer (toàn bộ các trang)
         self.line(54, 45, width - 54, 45)
-        page_str = f"Page {self._pageNumber} of {page_count}"
+        page_str = f"Trang {self._pageNumber} / {page_count}"
         self.drawRightString(width - 54, 32, page_str)
-        self.drawString(54, 32, "Academic Midterm Project — Data Structures and Algorithms")
+        self.drawString(54, 32, "Cấu trúc Dữ liệu & Giải thuật — Báo Cáo Học Thuật Dự Án Giữa Kỳ")
 
         self.restoreState()
 
-def build_pdf_report():
+def build_pdf_report(output_filename="Optimized_Merge_Sort_Report.pdf"):
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     results_dir = os.path.join(base_dir, 'data', 'results')
     figures_dir = os.path.join(base_dir, 'report', 'figures')
-    output_pdf = os.path.join(base_dir, 'report', 'Optimized_Merge_Sort_Report.pdf')
+    output_pdf = os.path.join(base_dir, 'report', output_filename)
 
     summary_csv = os.path.join(results_dir, 'summary_statistics.csv')
     if not os.path.exists(summary_csv):
-        print(f"Error: {summary_csv} not found! Cannot build PDF report without real experimental data.")
+        print(f"Lỗi: Không tìm thấy file {summary_csv}!")
         return
 
     df = pd.read_csv(summary_csv)
@@ -77,44 +89,43 @@ def build_pdf_report():
 
     styles = getSampleStyleSheet()
 
-    # Custom Academic Styles (Monochrome / Times-Roman)
     title_style = ParagraphStyle(
-        'DocTitle',
+        'DocTitleVN',
         parent=styles['Heading1'],
-        fontName='Times-Bold',
-        fontSize=18,
-        leading=22,
-        alignment=1, # Center
-        spaceAfter=8,
+        fontName='VN-Times-Bold',
+        fontSize=16.5,
+        leading=21,
+        alignment=1, # Canh giữa
+        spaceAfter=6,
         textColor=colors.black
     )
 
     subtitle_style = ParagraphStyle(
-        'DocSubtitle',
+        'DocSubtitleVN',
         parent=styles['Normal'],
-        fontName='Times-Italic',
+        fontName='VN-Times-Italic',
         fontSize=11,
         leading=14,
+        alignment=1,
+        spaceAfter=12,
+        textColor=colors.black
+    )
+
+    meta_style = ParagraphStyle(
+        'DocMetaVN',
+        parent=styles['Normal'],
+        fontName='VN-Times',
+        fontSize=9.5,
+        leading=13,
         alignment=1,
         spaceAfter=14,
         textColor=colors.black
     )
 
-    meta_style = ParagraphStyle(
-        'DocMeta',
-        parent=styles['Normal'],
-        fontName='Times-Roman',
-        fontSize=10,
-        leading=13,
-        alignment=1,
-        spaceAfter=16,
-        textColor=colors.black
-    )
-
     abstract_heading = ParagraphStyle(
-        'AbstractHeading',
+        'AbstractHeadingVN',
         parent=styles['Normal'],
-        fontName='Times-Bold',
+        fontName='VN-Times-Bold',
         fontSize=11,
         leading=14,
         alignment=1,
@@ -123,69 +134,69 @@ def build_pdf_report():
     )
 
     abstract_text = ParagraphStyle(
-        'AbstractText',
+        'AbstractTextVN',
         parent=styles['Normal'],
-        fontName='Times-Italic',
+        fontName='VN-Times-Italic',
         fontSize=9.5,
         leading=13.5,
-        alignment=4, # Justified
+        alignment=4, # Canh đều hai bên
         leftIndent=24,
         rightIndent=24,
-        spaceAfter=14,
+        spaceAfter=12,
         textColor=colors.black
     )
 
     h1_style = ParagraphStyle(
-        'AcademicH1',
+        'AcademicH1VN',
         parent=styles['Heading2'],
-        fontName='Times-Bold',
-        fontSize=12.5,
+        fontName='VN-Times-Bold',
+        fontSize=12,
         leading=15,
-        spaceBefore=11,
-        spaceAfter=5,
+        spaceBefore=10,
+        spaceAfter=4,
         keepWithNext=True,
         textColor=colors.black
     )
 
     body_style = ParagraphStyle(
-        'AcademicBody',
+        'AcademicBodyVN',
         parent=styles['Normal'],
-        fontName='Times-Roman',
+        fontName='VN-Times',
         fontSize=9.5,
         leading=13.5,
-        alignment=4, # Justified
-        spaceAfter=7,
+        alignment=4,
+        spaceAfter=6,
         textColor=colors.black
     )
 
     caption_style = ParagraphStyle(
-        'Caption',
+        'CaptionVN',
         parent=styles['Normal'],
-        fontName='Times-Italic',
+        fontName='VN-Times-Italic',
         fontSize=8.5,
         leading=11.5,
         alignment=1,
-        spaceBefore=4,
-        spaceAfter=9,
+        spaceBefore=3,
+        spaceAfter=8,
         textColor=colors.black
     )
 
     code_style = ParagraphStyle(
-        'CodeSnippet',
+        'CodeSnippetVN',
         parent=styles['Normal'],
-        fontName='Courier',
+        fontName='VN-Code',
         fontSize=8,
         leading=10.5,
         leftIndent=15,
-        spaceBefore=4,
-        spaceAfter=7,
+        spaceBefore=3,
+        spaceAfter=6,
         textColor=colors.black
     )
 
     table_cell = ParagraphStyle(
-        'TableCell',
+        'TableCellVN',
         parent=styles['Normal'],
-        fontName='Times-Roman',
+        fontName='VN-Times',
         fontSize=8.5,
         leading=10.5,
         alignment=1,
@@ -193,9 +204,9 @@ def build_pdf_report():
     )
 
     table_header = ParagraphStyle(
-        'TableHeader',
+        'TableHeaderVN',
         parent=styles['Normal'],
-        fontName='Times-Bold',
+        fontName='VN-Times-Bold',
         fontSize=8.5,
         leading=10.5,
         alignment=1,
@@ -204,77 +215,64 @@ def build_pdf_report():
 
     story = []
 
-    # Title Block
-    story.append(Paragraph("Empirical Evaluation and Cutoff Optimization of Merge Sort", title_style))
-    story.append(Paragraph("An Experimental Investigation Based on Princeton Algorithms 4th Edition", subtitle_style))
-    story.append(Paragraph("<b>Student Research Report</b> &bull; Course: Data Structures &amp; Algorithms &bull; Environment: OpenJDK 21 LTS / Windows 11", meta_style))
-    story.append(HRFlowable(width="100%", thickness=1.0, color=colors.black, spaceBefore=2, spaceAfter=10))
+    # Tiêu đề bài báo
+    story.append(Paragraph("KHẢO SÁT THỰC NGHIỆM VÀ XÁC ĐỊNH NGƯỠNG CUTOFF TỐI ƯU CHO THUẬT TOÁN MERGESORT", title_style))
+    story.append(Paragraph("Nghiên Cứu Chuyên Sâu Dựa Trên Giáo Trình Algorithms 4th Edition (Sedgewick &amp; Wayne)", subtitle_style))
+    story.append(Paragraph("<b>Báo Cáo Dự Án Học Thuật</b> &bull; Môn học: Cấu trúc Dữ liệu &amp; Giải thuật &bull; Môi trường: OpenJDK 21 LTS / Windows 11", meta_style))
+    story.append(HRFlowable(width="100%", thickness=1.0, color=colors.black, spaceBefore=2, spaceAfter=8))
 
-    # Abstract
-    story.append(Paragraph("ABSTRACT", abstract_heading))
+    # Tóm tắt (Abstract)
+    story.append(Paragraph("TÓM TẮT BÁO CÁO", abstract_heading))
     abstract_content = (
-        "This paper presents a rigorous empirical investigation into the optimization of the classic Merge Sort algorithm "
-        "through small subarray cutoff delegation to Insertion Sort, directly following the pedagogical curriculum and code structure "
-        "of <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne. Although theoretical divide-and-conquer complexity guarantees "
-        "<i>O(N</i> log <i>N)</i> asymptotic performance, recursive call stack allocation and auxiliary array manipulation incur substantial execution overhead on small partitions. "
-        "We construct an exhaustive experimental benchmark framework testing fourteen cutoff thresholds (1 to 64) across five problem scales (1,000 to 1,000,000 elements) "
-        "and four distinct input distributions (random, pre-sorted, reverse-sorted, and heavily duplicated). Every configuration is evaluated over 10 independent trials "
-        "following automated JVM JIT compiler warm-up, utilizing high-precision System.nanoTime() instrumentation. "
-        "Our empirical results demonstrate that setting a cutoff threshold between 8 and 16 consistently yields optimal performance, reducing execution time by 8% to 33% on random inputs, "
-        "while preserving <i>O(N</i> log <i>N)</i> worst-case scaling and algorithm stability. We discuss the architectural factors underpinning these observations, including instruction cache locality, "
-        "branch predictability, and memory traffic reduction."
+        "Báo cáo này trình bày nghiên cứu thực nghiệm toàn diện về kỹ thuật tối ưu hóa thuật toán Merge Sort kinh điển "
+        "thông qua cơ chế chuyển đổi sang Insertion Sort cho các mảng con kích thước nhỏ (CUTOFF), tuân thủ chặt chẽ nội dung bài giảng "
+        "và cấu trúc mã nguồn trong giáo trình <i>Algorithms, 4th Edition</i> của GS. Robert Sedgewick và Kevin Wayne. Mặc dù lý thuyết chia để trị "
+        "đảm bảo độ phức tạp tối ưu <i>O(N</i> log <i>N)</i>, nhưng việc phân rã đệ quy xuống mảng kích thước siêu nhỏ làm phát sinh chi phí quản lý "
+        "ngăn xếp (call stack) và thao tác sao chép sang mảng phụ <code>aux[]</code>. Chúng tôi xây dựng framework thực nghiệm tự động khảo sát "
+        "14 ngưỡng CUTOFF (1 đến 64) trên 5 kích thước mảng (1.000 đến 1.000.000 phần tử) và 4 dạng phân bố dữ liệu (ngẫu nhiên, có thứ tự, nghịch đảo, trùng lặp), "
+        "với tổng cộng 3.000 lượt đo độc lập sau khi khởi động làm nóng JVM JIT. Kết quả thực nghiệm khẳng định ngưỡng CUTOFF trong khoảng từ 8 đến 16 "
+        "(đặc biệt là CUTOFF = 10) mang lại hiệu quả tốt nhất, giúp rút ngắn thời gian thực thi từ 8% đến 33% trên dữ liệu ngẫu nhiên, "
+        "đồng thời bảo toàn tính ổn định (stability) và cận thời gian <i>O(N</i> log <i>N)</i> của thuật toán."
     )
     story.append(Paragraph(abstract_content, abstract_text))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.gray, spaceBefore=2, spaceAfter=12))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.gray, spaceBefore=2, spaceAfter=10))
 
-    # 1. Introduction & Objectives
-    story.append(Paragraph("1. Introduction and Research Objectives", h1_style))
+    # 1. Giới thiệu
+    story.append(Paragraph("1. Giới Thiệu và Mục Tiêu Nghiên Cứu", h1_style))
     story.append(Paragraph(
-        "Sorting constitutes one of the foundational primitives in computer science, underpinning database indexing, search queries, "
-        "and computational geometry. Von Neumann's Merge Sort (1945) is a canonical divide-and-conquer algorithm that guarantees "
-        "optimal asymptotic time complexity of <i>O(N</i> log <i>N)</i> across worst, average, and best cases. However, real-world hardware execution "
-        "involves non-negligible practical overheads: creating activation frames on the call stack, maintaining pointers, and copying "
-        "elements into an auxiliary buffer. On tiny partitions (e.g., <i>N</i> &le; 10), simple quadratic algorithms such as Insertion Sort "
-        "exhibit substantially lower constant factors due to compact inner loops, minimal data movement, and superior cache-line locality.",
+        "Thuật toán Merge Sort (John von Neumann, 1945) là giải thuật kinh điển đại diện cho phương pháp Chia để trị (Divide-and-Conquer). "
+        "Thuật toán đạt độ phức tạp thời gian lý thuyết tối ưu <i>O(N</i> log <i>N)</i> trong mọi trường hợp. Tuy nhiên, trên kiến trúc máy tính hiện đại, "
+        "việc tiếp tục phân đôi mảng xuống kích thước 1 phần tử tạo ra khoảng 2<i>N</i> - 1 lời gọi hàm đệ quy và liên tục sao chép dữ liệu qua mảng phụ. "
+        "Ngược lại, Insertion Sort tuy có độ phức tạp bậc hai <i>O(M<sup>2</sup>)</i> trong trường hợp tổng quát, nhưng với các đoạn mảng ngắn (<i>M</i> &le; 10), "
+        "nó có hằng số thời gian cực nhỏ, thực hiện tại chỗ, không tốn mảng phụ và tận dụng tối đa bộ nhớ đệm L1 Cache.",
         body_style
     ))
     story.append(Paragraph(
-        "The objective of this research is fourfold:<br/>"
-        "1. Faithfully implement Standard Merge Sort, Insertion Sort, and Optimized Merge Sort following the exact lecture slides from Sedgewick & Wayne.<br/>"
-        "2. Formulate a rigorous, reproducible benchmarking harness eliminating cold-start bias via JIT compiler warm-up and multi-trial statistics.<br/>"
-        "3. Systematically evaluate cutoff thresholds across varied input sizes <i>N</i> &isin; [10<sup>3</sup>, 10<sup>6</sup>] and data distributions (Random, Sorted, Reversed, Duplicates).<br/>"
-        "4. Determine whether an empirically universal optimal cutoff exists on modern x86-64 microarchitectures.",
-        body_style
-    ))
-
-    # 2. Theoretical Background
-    story.append(Paragraph("2. Theoretical Background and Complexity Analysis", h1_style))
-    story.append(Paragraph(
-        "Standard Merge Sort recursively divides an array <i>a[lo..hi]</i> into two halves <i>a[lo..mid]</i> and <i>a[mid+1..hi]</i> until "
-        "the subarray length is &le; 1. The recurrence relation for comparisons is given by:<br/>"
-        "&nbsp;&nbsp;&nbsp;&nbsp;<b>C(N) = C(&lfloor;N/2&rfloor;) + C(&lceil;N/2&rceil;) + N</b>, with <b>C(1) = 0</b>.<br/>"
-        "This yields an exact bound of <i>N</i> lg <i>N</i> - <i>N</i> + 1 &le; <i>C(N)</i> &le; <i>N</i> lg <i>N</i> comparisons, requiring 2<i>N</i> lg <i>N</i> array accesses "
-        "and an auxiliary array of size <i>N</i>.",
-        body_style
-    ))
-    story.append(Paragraph(
-        "In contrast, Insertion Sort operates in-place without auxiliary memory. On an array of length <i>M</i>, it requires ~<i>M</i><sup>2</sup>/4 comparisons "
-        "on average, but only <i>M</i> - 1 comparisons when the input is pre-sorted. When <i>M</i> is small (e.g., <i>M</i> &le; 10), the cost of "
-        "divide-and-conquer recursion exceeds <i>M</i><sup>2</sup>/4. The hybrid recurrence with cutoff <i>K</i> becomes:<br/>"
-        "&nbsp;&nbsp;&nbsp;&nbsp;<b>T(N) = 2 T(N/2) + &Theta;(N)</b> for <i>N</i> &gt; <i>K</i>, and <b>T(N) = &Theta;(N<sup>2</sup>)</b> for <i>N</i> &le; <i>K</i>.<br/>"
-        "Because <i>K</i> is a constant, asymptotic complexity remains strictly &Theta;(<i>N</i> log <i>N</i>), but the total number of recursive calls is reduced by "
-        "a factor of 2<sup><i>k</i></sup>, eliminating the vast majority of leaves in the recursion tree.",
+        "Mục tiêu nghiên cứu bao gồm:<br/>"
+        "1. Cài đặt trung thực Merge Sort, Insertion Sort và Optimized Merge Sort theo đúng slide bài giảng số 205, 229, 230 và 238.<br/>"
+        "2. Thiết lập quy trình đo lường chuẩn xác, loại trừ sai số khởi động lạnh thông qua JVM JIT Warm-up và lặp lại 10 lần độc lập.<br/>"
+        "3. Đánh giá toàn diện các mốc CUTOFF từ 1 đến 64 trên nhiều quy mô dữ liệu và 4 dạng phân bố dữ liệu.<br/>"
+        "4. Phân tích nguyên nhân vi kiến trúc và kiểm chứng khuyến nghị CUTOFF &asymp; 10 của GS. Robert Sedgewick.",
         body_style
     ))
 
-    # 3. Algorithm Implementation Details
-    story.append(Paragraph("3. Algorithm Implementation Details", h1_style))
+    # 2. Cơ sở lý thuyết
+    story.append(Paragraph("2. Cơ Sở Lý Thuyết và Phân Tích Độ Phức Tạp", h1_style))
     story.append(Paragraph(
-        "In strict compliance with lecture slides 205, 229, 230, and 238, our implementation preserves the standard Sedgewick conventions:",
+        "Merge Sort chuẩn chia mảng <i>a[lo..hi]</i> thành hai nửa đều nhau và trộn lại. Công thức truy hồi số phép so sánh:<br/>"
+        "&nbsp;&nbsp;&nbsp;&nbsp;<b>C(N) = 2 C(N/2) + N</b>, với <b>C(1) = 0</b>.<br/>"
+        "Số phép so sánh bị chặn trong khoảng <i>N</i> lg <i>N</i> - <i>N</i> + 1 &le; <i>C(N)</i> &le; <i>N</i> lg <i>N</i>, và đòi hỏi mảng phụ kích thước <i>N</i>.<br/>"
+        "Khi áp dụng ngưỡng chuyển đổi CUTOFF <i>K</i>:<br/>"
+        "&nbsp;&nbsp;&nbsp;&nbsp;<b>T(N) = 2 T(N/2) + &Theta;(N)</b> với <i>N</i> &gt; <i>K</i>, và <b>T(N) = &Theta;(N<sup>2</sup>)</b> với <i>N</i> &le; <i>K</i>.<br/>"
+        "Vì <i>K</i> là hằng số cố định, độ phức tạp tiệm cận tổng thể vẫn là &Theta;(<i>N</i> log <i>N</i>), nhưng việc cắt tỉa các nhánh đệ quy ở độ sâu cuối "
+        "giúp loại bỏ (1 - 1/<i>K</i>) &times; 100% số lần gọi hàm trên toàn bộ cây đệ quy.",
         body_style
     ))
+
+    # 3. Hiện thực thuật toán
+    story.append(Paragraph("3. Hiện Thực Thuật Toán Theo Slide Bài Giảng", h1_style))
     code_text = (
-        "// Optimized MergeSort recursive step (Slide 238)<br/>"
+        "// Cutoff optimization sang Insertion Sort khi subarray length &lt;= cutoff (Slide 238)<br/>"
         "private static void sort(Comparable[] a, Comparable[] aux, int lo, int hi, int cutoff) {<br/>"
         "&nbsp;&nbsp;&nbsp;&nbsp;if (hi &lt;= lo + cutoff - 1) {<br/>"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InsertionSort.sort(a, lo, hi);<br/>"
@@ -288,47 +286,42 @@ def build_pdf_report():
     )
     story.append(Paragraph(code_text, code_style))
     story.append(Paragraph(
-        "Crucially, the auxiliary array <code>aux[]</code> is allocated exactly once at the public entry point rather than inside recursive calls. "
-        "Subarray sorting in <code>InsertionSort.sort(a, lo, hi)</code> shifts elements using in-place comparisons without re-allocation. "
-        "The test suite comprises 70 unit tests verifying edge cases (empty, single-element, duplicates, negative numbers, pre-sorted, inverted) "
-        "and oracle equivalence against <code>java.util.Arrays.sort()</code>.",
+        "Mảng phụ <code>aux[]</code> được cấp phát đúng 1 lần tại hàm public ngoài cùng. "
+        "Bộ kiểm thử gồm 70 bài test đơn vị kiểm tra đầy đủ các biên dữ liệu (mảng rỗng, 1 phần tử, trùng lặp hoàn toàn, số âm, "
+        "ngược chiều, có thứ tự) và đối chứng tính đúng đắn với <code>java.util.Arrays.sort()</code>.",
         body_style
     ))
 
-    # 4. Experimental Framework & Environment
-    story.append(Paragraph("4. Experimental Environment and Benchmarking Protocol", h1_style))
+    # 4. Môi trường thực nghiệm
+    story.append(Paragraph("4. Môi Trường Thực Nghiệm và Phương Pháp Đo Lường", h1_style))
     story.append(Paragraph(
-        "To ensure high empirical validity, all tests were conducted under the following controlled environment:<br/>"
-        "&bull; <b>CPU:</b> 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz (4 physical cores, 8 threads, 8MB L3 Cache)<br/>"
-        "&bull; <b>Memory:</b> 8.00 GB Physical RAM (DDR4)<br/>"
-        "&bull; <b>Operating System:</b> Microsoft Windows 11 Home 64-bit (Build 22631)<br/>"
-        "&bull; <b>Java Virtual Machine:</b> OpenJDK 21.0.11 LTS (Temurin-21.0.11+10, 64-Bit Server VM, mixed mode)<br/>"
-        "&bull; <b>Execution JVM Parameters:</b> <code>-Xms512m -Xmx2048m</code><br/>"
-        "&bull; <b>Instrumentation:</b> <code>System.nanoTime()</code> timing isolated to the sorting procedure only.<br/>"
-        "&bull; <b>JIT Warm-up:</b> 8 iterations of 50,000 elements preceding timed trials.<br/>"
-        "&bull; <b>Repetitions:</b> 10 independent trials per configuration with deterministic PRNG seeds.",
+        "&bull; <b>CPU:</b> 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz (4 cores, 8 threads, 8MB L3 Cache)<br/>"
+        "&bull; <b>Bộ nhớ RAM:</b> 8.00 GB DDR4<br/>"
+        "&bull; <b>Hệ điều hành:</b> Microsoft Windows 11 Home 64-bit (Build 22631)<br/>"
+        "&bull; <b>Java Virtual Machine:</b> OpenJDK 21.0.11 LTS (Temurin-21.0.11+10, 64-Bit Server VM, tham số <code>-Xms512m -Xmx2048m</code>)<br/>"
+        "&bull; <b>Quy trình đo:</b> Khởi động làm nóng JVM bằng 8 vòng lặp 50.000 phần tử; cô lập <code>System.nanoTime()</code> cho thuật toán; "
+        "thực hiện 10 lần lặp độc lập với seed cố định cho mỗi cấu hình.",
         body_style
     ))
 
-    # 5. Experimental Results & Analysis Tables
-    story.append(Paragraph("5. Empirical Benchmark Results", h1_style))
+    # 5. Kết quả thực nghiệm
+    story.append(Paragraph("5. Kết Quả Thực Nghiệm và Bảng Thống Kê", h1_style))
     story.append(Paragraph(
-        "Table 1 outlines the measured execution times (mean &plusmn; standard deviation) for random inputs across input scales <i>N</i>, "
-        "contrasting Standard Merge Sort with prominent cutoff values (7, 10, 16) and reporting the empirically optimal cutoff.",
+        "Bảng 1 tổng hợp thời gian chạy (trung bình &plusmn; độ lệch chuẩn) trên dữ liệu ngẫu nhiên, đối chứng giữa MergeSort chuẩn "
+        "với các mốc CUTOFF nổi bật (7, 10, 16) và ngưỡng tối ưu thực tế.",
         body_style
     ))
 
-    # Build Table 1
     table_data = [
         [
-            Paragraph("<b>N</b>", table_header),
-            Paragraph("<b>Standard Merge (ms)</b>", table_header),
-            Paragraph("<b>Cutoff = 7 (ms)</b>", table_header),
-            Paragraph("<b>Cutoff = 10 (ms)</b>", table_header),
-            Paragraph("<b>Cutoff = 16 (ms)</b>", table_header),
-            Paragraph("<b>Optimal Cutoff</b>", table_header),
-            Paragraph("<b>Optimal Time (ms)</b>", table_header),
-            Paragraph("<b>Speedup (%)</b>", table_header)
+            Paragraph("<b>Kích thước N</b>", table_header),
+            Paragraph("<b>MergeSort chuẩn (ms)</b>", table_header),
+            Paragraph("<b>CUTOFF = 7 (ms)</b>", table_header),
+            Paragraph("<b>CUTOFF = 10 (ms)</b>", table_header),
+            Paragraph("<b>CUTOFF = 16 (ms)</b>", table_header),
+            Paragraph("<b>CUTOFF Tối ưu</b>", table_header),
+            Paragraph("<b>Thời gian tối ưu (ms)</b>", table_header),
+            Paragraph("<b>Cải thiện (%)</b>", table_header)
         ]
     ]
 
@@ -345,7 +338,6 @@ def build_pdf_report():
         best_row = sub_opt.loc[sub_opt['MeanMs'].idxmin()]
         best_c = int(best_row['Cutoff'])
         best_mean = best_row['MeanMs']
-        best_sd = best_row['StdDevMs']
 
         c7 = sub_opt[sub_opt['Cutoff'] == 7]['MeanMs'].values[0]
         c10 = sub_opt[sub_opt['Cutoff'] == 10]['MeanMs'].values[0]
@@ -364,7 +356,7 @@ def build_pdf_report():
             Paragraph(f"<b>{speedup:+.1f}%</b>", table_cell)
         ])
 
-    t1 = Table(table_data, colWidths=[52, 80, 58, 58, 58, 52, 72, 60])
+    t1 = Table(table_data, colWidths=[58, 76, 56, 56, 56, 52, 74, 60])
     t1.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e6e6e6')),
         ('BOX', (0, 0), (-1, -1), 1.0, colors.black),
@@ -375,15 +367,11 @@ def build_pdf_report():
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
     ]))
 
-    story.append(KeepTogether([t1, Paragraph("<b>Table 1:</b> Performance comparison on uniformly random data (10 trials per configuration).", caption_style)]))
+    story.append(KeepTogether([t1, Paragraph("<b>Bảng 1:</b> So sánh hiệu năng trên dữ liệu ngẫu nhiên (10 lần chạy độc lập mỗi cấu hình).", caption_style)]))
     story.append(Spacer(1, 8))
 
-    # 6. Visualization & Charts
-    story.append(Paragraph("6. Visualization and Empirical Trend Analysis", h1_style))
-    story.append(Paragraph(
-        "The following black-and-white charts plot the empirical behaviors observed during the benchmarking campaign.",
-        body_style
-    ))
+    # 6. Biểu đồ
+    story.append(Paragraph("6. Đồ Thị Phân Tích Thực Nghiệm (Đồ Họa Đen Trắng)", h1_style))
 
     fig1_path = os.path.join(figures_dir, 'fig1_cutoff_vs_time.png')
     fig2_path = os.path.join(figures_dir, 'fig2_size_vs_time.png')
@@ -393,99 +381,75 @@ def build_pdf_report():
     if os.path.exists(fig1_path):
         story.append(KeepTogether([
             Image(fig1_path, width=6.0*inch, height=3.6*inch),
-            Paragraph("<b>Figure 1:</b> Execution time as a function of cutoff threshold for random inputs. The parabolic shape clearly illustrates the tradeoff between call-stack overhead and quadratic insertion costs.", caption_style)
+            Paragraph("<b>Hình 1:</b> Thời gian thực thi theo ngưỡng CUTOFF trên dữ liệu ngẫu nhiên. Vùng tối ưu thể hiện rõ đáy parabol trong khoảng [7..16].", caption_style)
         ]))
         story.append(Spacer(1, 8))
 
     if os.path.exists(fig2_path):
         story.append(KeepTogether([
             Image(fig2_path, width=6.0*inch, height=3.6*inch),
-            Paragraph("<b>Figure 2:</b> Empirical runtime scaling versus input size N on a log-log scale. Both standard and optimized variants closely conform to the theoretical O(N log N) reference trajectory.", caption_style)
+            Paragraph("<b>Hình 2:</b> Quy luật mở rộng thời gian thực thi theo kích thước N (thang Log-Log). Cả hai giải thuật bám sát cận O(N log N).", caption_style)
         ]))
         story.append(Spacer(1, 8))
 
     if os.path.exists(fig3_path):
         story.append(KeepTogether([
             Image(fig3_path, width=6.0*inch, height=3.4*inch),
-            Paragraph("<b>Figure 3:</b> Percentage execution time reduction achieved by Optimized MergeSort (Cutoff = 10) relative to Standard MergeSort across all tested problem sizes.", caption_style)
+            Paragraph("<b>Hình 3:</b> Tỷ lệ giảm thời gian thực thi của Optimized MergeSort (CUTOFF = 10) so với MergeSort chuẩn.", caption_style)
         ]))
         story.append(Spacer(1, 8))
 
     if os.path.exists(fig4_path):
         story.append(KeepTogether([
             Image(fig4_path, width=6.0*inch, height=3.4*inch),
-            Paragraph("<b>Figure 4:</b> Comparative execution time across four distinct input distributions (Random, Sorted, Reversed, Duplicates) at N = 500,000.", caption_style)
+            Paragraph("<b>Hình 4:</b> So sánh hiệu năng giữa 4 dạng phân bố dữ liệu (Ngẫu nhiên, Có thứ tự, Nghịch đảo, Trùng lặp) tại N = 500.000.", caption_style)
         ]))
         story.append(Spacer(1, 8))
 
-    # 7. Discussion
-    story.append(Paragraph("7. Discussion and Microarchitectural Insights", h1_style))
+    # 7. Bàn luận
+    story.append(Paragraph("7. Bàn Luận và Nhận Xét Vi Kiến Trúc", h1_style))
     story.append(Paragraph(
-        "<b>1. Trade-off Dynamics:</b> When the cutoff threshold <i>K</i> is set too low (e.g., <i>K</i> = 1 or 2), the algorithm behaves almost identically "
-        "to standard Merge Sort, suffering from excessive stack frame construction and recursive dispatch. Conversely, as <i>K</i> exceeds 32, "
-        "Insertion Sort's <i>O(K<sup>2</sup>)</i> comparison count dominates, quickly degrading overall performance. The empirical optimum consistently "
-        "stabilizes in the region <i>K</i> &isin; [8, 16].",
+        "<b>1. Động lực đánh đổi (Trade-off):</b> Khi ngưỡng CUTOFF <i>K</i> quá nhỏ (1 hoặc 2), chương trình vẫn chịu chi phí đệ quy lớn. "
+        "Khi <i>K</i> vượt quá 32, chi phí bậc hai <i>O(K<sup>2</sup>)</i> của Insertion Sort bắt đầu chi phối và làm chậm giải thuật. "
+        "Vùng tối ưu thực nghiệm ổn định trong khoảng <i>K</i> &isin; [6, 12].",
         body_style
     ))
     story.append(Paragraph(
-        "<b>2. Textbook Recommendations:</b> Sedgewick & Wayne noted in earlier editions a recommended cutoff of 7, updating this to ~10 in the 4th Edition. "
-        "Our measurements thoroughly validate this guideline: the performance delta between <i>K</i> = 7, <i>K</i> = 8, <i>K</i> = 10, and <i>K</i> = 12 "
-        "lies well within 1.5% of the global minimum across all distributions. Hence, choosing <i>K</i> = 10 represents a robust, architecture-agnostic default.",
+        "<b>2. Kiểm chứng khuyến nghị giáo trình:</b> Trong giáo trình Sedgewick, tác giả từng khuyến nghị <i>K</i> = 7 (ấn bản cũ) và <i>K</i> &asymp; 10 (ấn bản mới). "
+        "Số liệu thực nghiệm cho thấy sự chênh lệch hiệu năng giữa <i>K</i> = 7, 8, 10, 12 là rất nhỏ (&le; 1.5%), khẳng định việc chọn <i>K</i> = 10 "
+        "là lựa chọn phổ quát, an toàn và tối ưu nhất cho nhiều cấu hình phần cứng.",
         body_style
     ))
     story.append(Paragraph(
-        "<b>3. Distribution Effects:</b> On pre-sorted data, Insertion Sort operates in strict linear time <i>O(M)</i>. Consequently, larger cutoffs do not suffer "
-        "quadratic penalties on sorted runs, yielding even larger speedups. For duplicate-heavy arrays, fewer exchanges are performed, further bolstering the optimization gain.",
-        body_style
-    ))
-
-    # 8. Limitations & Threats to Validity
-    story.append(Paragraph("8. Threats to Validity and Limitations", h1_style))
-    story.append(Paragraph(
-        "Although the benchmarking procedure adhered strictly to empirical best practices, several environmental factors introduce minor variability: "
-        "(a) Operating system thread scheduling and background service interrupts on Windows 11; "
-        "(b) Adaptive JIT compilation tiered recompilation (C1 vs. C2); "
-        "(c) Garbage collection cycles, mitigated by explicit heap pre-allocation and inter-run GC hints. "
-        "The standard deviation remained below 5% across all major runs, confirming strong statistical reliability.",
+        "<b>3. Ảnh hưởng của phân bố dữ liệu:</b> Trên mảng đã sắp xếp sẵn (Sorted), Insertion Sort chạy tuyến tính <i>O(M)</i>, do đó CUTOFF lớn mang lại "
+        "hiệu quả vượt trội (nhanh hơn tới 28.9%). Trên mảng nghịch đảo, CUTOFF nhỏ (4 đến 7) giúp tránh hiện tượng bùng nổ so sánh bậc hai.",
         body_style
     ))
 
-    # 9. Conclusion
-    story.append(Paragraph("9. Conclusion", h1_style))
+    # 8. Kết luận
+    story.append(Paragraph("8. Kết Luận", h1_style))
     story.append(Paragraph(
-        "This project empirically validates the small-subarray cutoff optimization for Merge Sort as taught in Princeton's <i>Algorithms, 4th Edition</i>. "
-        "By switching to Insertion Sort when subarray size &le; 10, practitioners can achieve an immediate 8% to 33% wall-clock runtime reduction "
-        "without altering asymptotic complexity, memory bounds, or algorithmic stability. The comprehensive suite of 70 unit tests, automated dataset generators, "
-        "and reproducible benchmarking scripts confirm that this optimization is both theoretically elegant and practically indispensable.",
+        "Nghiên cứu đã hoàn thành toàn diện việc hiện thực và kiểm nghiệm thuật toán MergeSort cải tiến theo đúng giáo trình môn học. "
+        "Việc áp dụng ngưỡng CUTOFF = 10 giúp giảm thời gian thực thi từ 8% đến 33% mà không làm thay đổi độ phức tạp bộ nhớ, cận thời gian tiệm cận "
+        "hay tính ổn định của giải thuật.",
         body_style
     ))
 
-    # 10. Reproduction Guide
-    story.append(Paragraph("10. Reproduction Guide", h1_style))
-    story.append(Paragraph(
-        "To reproduce the complete experimental suite from source:<br/>"
-        "1. Compile test and benchmark suites: <code>javac -d bin src/main/java/com/mergesort/*.java benchmark/*.java</code><br/>"
-        "2. Run correctness test suite: <code>java -cp bin com.mergesort.SortCorrectnessTest</code><br/>"
-        "3. Run automated benchmark: <code>java -cp bin com.mergesort.benchmark.BenchmarkRunner</code><br/>"
-        "4. Generate charts &amp; statistical analysis: <code>python benchmark/scripts/plot_results.py</code><br/>"
-        "5. Compile PDF report: <code>python report/generate_pdf_report.py</code>",
-        body_style
-    ))
-
-    # References
+    # 9. Tài liệu tham khảo
     story.append(Spacer(1, 8))
-    story.append(Paragraph("References", h1_style))
+    story.append(Paragraph("Tài Liệu Tham Khảo", h1_style))
     references = (
         "[1] Robert Sedgewick and Kevin Wayne. <i>Algorithms, 4th Edition</i>. Addison-Wesley Professional, 2011.<br/>"
         "[2] John von Neumann. <i>First Draft of a Report on the EDVAC</i>. Moore School of Electrical Engineering, University of Pennsylvania, 1945.<br/>"
         "[3] Donald E. Knuth. <i>The Art of Computer Programming, Volume 3: Sorting and Searching</i>. Addison-Wesley, 1998.<br/>"
-        "[4] Georges D. Gouy. <i>Empirical Analysis of Recursive Divide-and-Conquer Hybrid Sorts</i>. ACM Transactions on Algorithms, 2018."
+        "[4] Bài giảng môn học Cấu trúc Dữ liệu và Giải thuật, Trường Đại học Công nghệ (VNU-UET)."
     )
     story.append(Paragraph(references, body_style))
 
-    # Build Document
-    doc.build(story, canvasmaker=NumberedCanvas)
-    print(f"Academic PDF report successfully built at: {output_pdf}")
+    doc.build(story, canvasmaker=VietnameseNumberedCanvas)
+    print(f"Báo cáo PDF đã được biên dịch thành công tại: {output_pdf}")
 
 if __name__ == '__main__':
-    build_pdf_report()
+    # Biên dịch cả hai file PDF với nội dung tiếng Việt chuẩn học thuật
+    build_pdf_report("Optimized_Merge_Sort_Report.pdf")
+    build_pdf_report("Bao_Cao_Thuc_Nghiem_MergeSort_Cutoff.pdf")
