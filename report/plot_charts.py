@@ -26,21 +26,32 @@ best_t = cutoff_df.loc[best_idx, 'time_ms']
 
 # ==============================================
 # Hinh 1: CUTOFF vs Thoi gian (n=100000, random)
-# Chinh sua vi tri chu va mui ten len vung trong, co khung trang bao quanh de khong bi de len duong line
+# - Node toi uu mau do
+# - Duong net dut mau do
+# - Bo mui ten
+# - Goc duoi trai cua khung thong tin dat tai vi tri (10, 25)
 # ==============================================
 fig, ax = plt.subplots(figsize=(7.8, 4.0))
-ax.plot(cutoff_df['cutoff'], cutoff_df['time_ms'], 'o-', color='black', linewidth=1.5, markersize=5)
-ax.axvline(x=best_c, color='gray', linestyle='--', linewidth=1)
 
-# Dat chu o khoang trong ben tren (y ~ 27) kem mui ten chi xuong diem cuc tieu (8, 18.4)
-ax.annotate(
+# 1. Duong du lieu chinh mau den
+ax.plot(cutoff_df['cutoff'], cutoff_df['time_ms'], 'o-', color='black', linewidth=1.5, markersize=5, zorder=2)
+
+# 2. Duong net dut mau do tai CUTOFF toi uu
+ax.axvline(x=best_c, color='red', linestyle='--', linewidth=1.2, alpha=0.85, zorder=1)
+
+# 3. Node diem toi uu to mau do noi bat
+ax.plot(best_c, best_t, 'o', color='red', markersize=7.5, zorder=4)
+
+# 4. Khung thong tin (bo mui ten, goc duoi trai nam dung tai toa do 10, 25)
+ax.text(
+    10, 25,
     f'Tối ưu: CUTOFF = {best_c}\n({best_t:.1f} ms)',
-    xy=(best_c, best_t),
-    xytext=(best_c + 7, best_t + 8.5),
-    arrowprops=dict(arrowstyle='->', color='black', lw=1.2, shrinkB=4),
+    ha='left',
+    va='bottom',
     fontsize=9.5,
     fontweight='bold',
-    bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor='black', linewidth=0.8, alpha=0.95)
+    bbox=dict(boxstyle='round,pad=0.45', facecolor='white', edgecolor='black', linewidth=0.8, alpha=0.95),
+    zorder=5
 )
 
 ax.set_xlabel('Giá trị CUTOFF')
@@ -114,4 +125,4 @@ fig.tight_layout()
 fig.savefig('report/figures/fig4_distribution.png')
 plt.close()
 
-print(f"Đã vẽ lại Fig 1 với nhãn mũi tên rõ ràng, không bị đè lên đường vẽ.")
+print(f"Đã cập nhật Fig 1 theo đúng yêu cầu: node đỏ, nét đứt đỏ, bỏ mũi tên, góc dưới trái tại (10, 25).")
