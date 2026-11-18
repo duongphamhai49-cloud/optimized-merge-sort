@@ -26,12 +26,23 @@ best_t = cutoff_df.loc[best_idx, 'time_ms']
 
 # ==============================================
 # Hinh 1: CUTOFF vs Thoi gian (n=100000, random)
+# Chinh sua vi tri chu va mui ten len vung trong, co khung trang bao quanh de khong bi de len duong line
 # ==============================================
 fig, ax = plt.subplots(figsize=(7.8, 4.0))
 ax.plot(cutoff_df['cutoff'], cutoff_df['time_ms'], 'o-', color='black', linewidth=1.5, markersize=5)
 ax.axvline(x=best_c, color='gray', linestyle='--', linewidth=1)
-ax.annotate(f'CUTOFF = {best_c}\n({best_t:.1f} ms)', xy=(best_c, best_t),
-            xytext=(best_c + 3, best_t + 1.2), fontsize=9)
+
+# Dat chu o khoang trong ben tren (y ~ 27) kem mui ten chi xuong diem cuc tieu (8, 18.4)
+ax.annotate(
+    f'Tối ưu: CUTOFF = {best_c}\n({best_t:.1f} ms)',
+    xy=(best_c, best_t),
+    xytext=(best_c + 7, best_t + 8.5),
+    arrowprops=dict(arrowstyle='->', color='black', lw=1.2, shrinkB=4),
+    fontsize=9.5,
+    fontweight='bold',
+    bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor='black', linewidth=0.8, alpha=0.95)
+)
+
 ax.set_xlabel('Giá trị CUTOFF')
 ax.set_ylabel('Thời gian trung bình (ms)')
 ax.grid(True, linestyle=':', alpha=0.6)
@@ -103,4 +114,4 @@ fig.tight_layout()
 fig.savefig('report/figures/fig4_distribution.png')
 plt.close()
 
-print(f"Đã cập nhật script vẽ biểu đồ tự động theo CUTOFF = {best_c}.")
+print(f"Đã vẽ lại Fig 1 với nhãn mũi tên rõ ràng, không bị đè lên đường vẽ.")
