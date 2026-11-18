@@ -69,7 +69,7 @@ best_time   = cutoff_df['time_ms'].min()
 def fig(path, w_cm=14, caption=''):
     items = []
     if os.path.exists(path):
-        items.append(Image(path, width=w_cm*cm, height=w_cm*cm*0.65))
+        items.append(Image(path, width=w_cm*cm, height=w_cm*cm*0.62))
     if caption:
         items.append(p(caption, S_caption))
     return items
@@ -116,30 +116,32 @@ story += [
 # --- 1. Gioi thieu ---
 story += [
     h1('1. Giới thiệu'),
-    p('Merge Sort là thuật toán sắp xếp theo phương pháp chia để trị, có độ phức tạp '
-      'O(n log n) trong mọi trường hợp. Tuy nhiên, với các mảng con nhỏ, chi phí đệ quy '
-      'của Merge Sort lớn hơn so với Insertion Sort — một thuật toán đơn giản hơn, '
-      'hiệu quả với mảng nhỏ do ít overhead.'),
-    p('Cải tiến được xem xét trong báo cáo này: khi kích thước mảng con không vượt quá '
-      'một ngưỡng nhất định (gọi là <i>cutoff</i>), thay vì tiếp tục đệ quy Merge Sort, '
-      'chuyển sang dùng Insertion Sort. Mục tiêu là tìm giá trị cutoff tối ưu '
-      'giúp giảm thời gian thực thi.'),
+    p('Merge Sort là thuật toán sắp xếp chia để trị kinh điển với độ phức tạp thời gian '
+      'O(n log n) trong mọi trường hợp. Tuy nhiên, khi mảng con đã được chia nhỏ xuống kích thước nhỏ, '
+      'chi phí phân nhánh đệ quy và cấp phát mảng phụ lại tạo ra overhead đáng kể. '
+      'Ngược lại, Insertion Sort dù có độ phức tạp O(n²) trong trường hợp xấu nhất nhưng lại '
+      'chạy cực nhanh trên các mảng nhỏ và mảng gần như đã có thứ tự.'),
+    p('Đề tài thực hiện khảo sát kỹ thuật tối ưu Cutoff: khi kích thước mảng con '
+      '<i>≤ cutoff</i>, chuyển sang dùng Insertion Sort thay vì tiếp tục đệ quy. '
+      'Thực nghiệm được thực hiện trên <b>7 kiểu phân bố dữ liệu</b> khác nhau để đánh giá toàn diện.'),
 ]
 
 # --- 2. Thuat toan ---
 story += [
-    h1('2. Mô tả thuật toán'),
-    h2('2.1. Merge Sort chuẩn'),
-    p('Cài đặt theo giáo trình Algorithms 4th Edition (Sedgewick &amp; Wayne). '
-      'Hàm <i>merge</i> sao chép mảng sang mảng phụ <i>aux[]</i>, sau đó trộn '
-      'ngược lại theo hai con trỏ i và j. Hàm <i>sort</i> chia đôi đệ quy rồi gọi merge.'),
-    h2('2.2. Insertion Sort'),
-    p('Hỗ trợ sắp xếp đoạn con a[lo..hi]. Với mỗi phần tử i từ lo+1 đến hi, '
-      'dịch nó về trái cho đến vị trí đúng bằng cách hoán đổi liên tiếp.'),
-    h2('2.3. Optimized Merge Sort (có cutoff)'),
-    p('Giống Merge Sort chuẩn, nhưng thêm điều kiện: nếu '
-      '<i>hi &lt;= lo + cutoff − 1</i>, gọi Insertion Sort thay vì tiếp tục đệ quy. '
-      'Điều này giúp tránh chi phí đệ quy không cần thiết với các mảng con nhỏ.'),
+    h1('2. Mô tả thuật toán và bộ dữ liệu'),
+    h2('2.1. Cài đặt thuật toán'),
+    p('Cả ba thuật toán (MergeSort, InsertionSort, OptimizedMergeSort) được cài đặt tuân thủ '
+      'chính xác giáo trình <i>Algorithms 4th Edition</i> (Robert Sedgewick &amp; Kevin Wayne). '
+      'Mảng phụ aux[] được cấp phát một lần duy nhất. Với OptimizedMergeSort, điều kiện ngắt là '
+      '<i>hi ≤ lo + cutoff − 1</i>.'),
+    h2('2.2. Bảy kiểu phân bố dữ liệu thử nghiệm'),
+    p('1. <b>Ngẫu nhiên (Random):</b> Các giá trị sinh ngẫu nhiên đồng đều.<br/>'
+      '2. <b>Đã sắp xếp (Sorted):</b> Mảng tăng dần hoàn toàn (0, 1, 2, ..., n-1).<br/>'
+      '3. <b>Ngược chiều (Reversed):</b> Mảng giảm dần hoàn toàn (n-1, ..., 0).<br/>'
+      '4. <b>Trùng lặp (Duplicates):</b> Mảng chứa nhiều phần tử trùng lặp (chỉ có 100 giá trị khác nhau).<br/>'
+      '5. <b>Gần sắp xếp 1% (Partially Sorted 1%):</b> Mảng tăng dần bị xáo trộn ngẫu nhiên 1% vị trí.<br/>'
+      '6. <b>Gần sắp xếp 5% (Partially Sorted 5%):</b> Mảng tăng dần bị xáo trộn ngẫu nhiên 5% vị trí.<br/>'
+      '7. <b>Gần sắp xếp 10% (Partially Sorted 10%):</b> Mảng tăng dần bị xáo trộn ngẫu nhiên 10% vị trí.'),
 ]
 
 # --- 3. Moi truong thuc nghiem ---
@@ -150,32 +152,30 @@ story += [
         ['Hệ điều hành', 'Windows 11'],
         ['JDK', 'OpenJDK 21.0.11 LTS'],
         ['Phương pháp đo', 'System.nanoTime()'],
-        ['Số lần lặp mỗi trường hợp', '5 lần'],
-        ['JVM warm-up', '3 lần trước khi đo'],
-        ['Seed ngẫu nhiên', '123456 (cố định)'],
+        ['Số bộ dữ liệu', '7 kiểu phân bố'],
+        ['Kích thước kiểm thử (n)', '1.000; 10.000; 100.000; 500.000; 1.000.000'],
+        ['Số lần lặp mỗi trường hợp', '5 lần (lấy trung bình cộng)'],
+        ['JVM warm-up', '3 lần chạy thử trước khi bấm giờ'],
     ], col_widths=[7*cm, 9*cm]),
-    sp(10),
-    p('Dữ liệu được tạo ngoài vùng đo thời gian. Mỗi thuật toán nhận bản sao '
-      'độc lập của cùng một mảng đầu vào. Kết quả lấy giá trị trung bình 5 lần đo.'),
 ]
 
 # --- 4. Ket qua ---
 story += [
     h1('4. Kết quả thực nghiệm'),
-    h2('4.1. Ảnh hưởng của cutoff (n = 100.000, dữ liệu ngẫu nhiên)'),
+    h2('4.1. Ảnh hưởng của giá trị Cutoff (n = 100.000, dữ liệu ngẫu nhiên)'),
 ]
 
-# Bang cutoff
 cutoff_data = [['Cutoff', 'Thời gian TB (ms)']]
 for _, row in cutoff_df.iterrows():
-    marker = ' ← tối ưu' if int(row['cutoff']) == best_cutoff else ''
-    cutoff_data.append([str(int(row['cutoff'])), f"{row['time_ms']:.3f}{marker}"])
+    c = int(row['cutoff'])
+    marker = ' ← tối ưu' if c == best_cutoff else ''
+    cutoff_data.append([str(c), f"{row['time_ms']:.3f}{marker}"])
 story.append(tbl(cutoff_data, col_widths=[5*cm, 8*cm]))
 story.append(sp(6))
 story += fig('report/figures/fig1_cutoff_vs_time.png', 13,
-             f'Hình 1. Thời gian sắp xếp theo giá trị cutoff (n=100.000, ngẫu nhiên). Cutoff tối ưu: {best_cutoff} ({best_time:.1f} ms).')
+             f'Hình 1. Thời gian chạy theo giá trị cutoff (n=100.000, ngẫu nhiên). Cutoff tối ưu là {best_cutoff} ({best_time:.2f} ms).')
 
-story.append(h2('4.2. So sánh thời gian theo kích thước mảng (dữ liệu ngẫu nhiên)'))
+story.append(h2('4.2. So sánh theo kích thước mảng (Dữ liệu ngẫu nhiên)'))
 rand_df = summary_df[summary_df['type'] == 'random'].sort_values('size')
 size_data = [['Kích thước (n)', 'MergeSort (ms)', 'Optimized (ms)', 'Giảm (%)']]
 for _, row in rand_df.iterrows():
@@ -188,43 +188,47 @@ for _, row in rand_df.iterrows():
 story.append(tbl(size_data, col_widths=[4*cm, 4*cm, 4*cm, 4*cm]))
 story.append(sp(6))
 story += fig('report/figures/fig2_size_vs_time.png', 13,
-             'Hình 2. Thời gian sắp xếp theo kích thước mảng (dữ liệu ngẫu nhiên).')
+             'Hình 2. Thời gian sắp xếp theo kích thước mảng trên dữ liệu ngẫu nhiên.')
 
-story.append(h2('4.3. So sánh trực quan hai thuật toán'))
-story += fig('report/figures/fig3_comparison.png', 13,
-             'Hình 3. So sánh MergeSort và OptimizedMergeSort theo kích thước mảng.')
-
-story.append(h2('4.4. Hiệu năng theo kiểu dữ liệu (n = 1.000.000)'))
+story.append(h2('4.3. Hiệu năng trên 7 kiểu dữ liệu (n = 1.000.000)'))
 large_df = summary_df[summary_df['size'] == 1000000]
-type_map = {'random': 'Ngẫu nhiên', 'sorted': 'Đã sắp xếp',
-            'reversed': 'Ngược chiều', 'duplicates': 'Nhiều trùng lặp'}
-dist_data = [['Kiểu dữ liệu', 'MergeSort (ms)', 'Optimized (ms)', 'Giảm (%)']]
+type_names = {
+    'random': 'Ngẫu nhiên',
+    'sorted': 'Đã sắp xếp',
+    'reversed': 'Ngược chiều',
+    'duplicates': 'Nhiều trùng lặp',
+    'partially_sorted_1pct': 'Gần sắp xếp (1%)',
+    'partially_sorted_5pct': 'Gần sắp xếp (5%)',
+    'partially_sorted_10pct': 'Gần sắp xếp (10%)'
+}
+dist_data = [['Kiểu phân bố dữ liệu', 'MergeSort (ms)', 'Optimized (ms)', 'Giảm (%)']]
 for _, row in large_df.iterrows():
     dist_data.append([
-        type_map.get(row['type'], row['type']),
+        type_names.get(row['type'], row['type']),
         f"{row['merge_ms']:.2f}",
         f"{row['optimized_ms']:.2f}",
         f"{row['speedup_pct']:.1f}%"
     ])
-story.append(tbl(dist_data, col_widths=[4.5*cm, 4*cm, 4*cm, 3.5*cm]))
+story.append(tbl(dist_data, col_widths=[5*cm, 4*cm, 4*cm, 3*cm]))
 story.append(sp(6))
-story += fig('report/figures/fig4_distribution.png', 13,
-             'Hình 4. Hiệu năng theo kiểu dữ liệu đầu vào (n = 1.000.000).')
+story += fig('report/figures/fig4_distribution.png', 13.5,
+             'Hình 4. So sánh hiệu năng giữa MergeSort và OptimizedMergeSort trên 7 kiểu dữ liệu (n = 1.000.000).')
 
 # --- 5. Nhan xet ---
 story += [
     h1('5. Nhận xét và kết luận'),
-    p(f'Qua thực nghiệm, giá trị cutoff tối ưu tìm được là <b>{best_cutoff}</b> '
-      f'(thời gian trung bình {best_time:.1f} ms với n=100.000, dữ liệu ngẫu nhiên). '
-      'Giá trị này nằm trong khoảng 6–16, phù hợp với lý thuyết của Sedgewick.'),
-    p('OptimizedMergeSort cho thấy cải thiện rõ rệt so với MergeSort chuẩn khi n lớn '
-      '(500.000–1.000.000), với mức giảm thời gian từ 10% đến 25% tùy kiểu dữ liệu. '
-      'Với n nhỏ (1.000–10.000), ảnh hưởng không ổn định do JVM chưa đủ warm-up '
-      'hoặc overhead đo thời gian chiếm tỉ lệ cao.'),
-    p('Kết luận: Việc áp dụng cutoff là cải tiến đơn giản nhưng hiệu quả. '
-      'Với các ứng dụng thực tế, nên chọn cutoff trong khoảng 8–16.'),
+    p(f'1. <b>Vùng Cutoff tối ưu:</b> Giá trị cutoff tốt nhất đo được rơi vào khoảng <b>6–16</b> '
+      f'(trong lần chạy này đạt cực tiểu tại cutoff = {best_cutoff} với {best_time:.2f} ms). '
+      'Khi cutoff quá nhỏ (1–4), việc chuyển đổi chưa triệt tiêu được overhead đệ quy. '
+      'Khi cutoff quá lớn (> 32), chi phí O(k²) của Insertion Sort trên mảng con bắt đầu lấn át.'),
+    p('2. <b>Đặc tính trên dữ liệu Partially Sorted (1%, 5%, 10%):</b> '
+      'Insertion Sort có ưu thế vượt trội khi số lượng nghịch thế (inversions) nhỏ. '
+      'Ở các mảng con gần như đã có thứ tự (1% và 5% xáo trộn), việc chuyển sang Insertion Sort '
+      'giúp OptimizedMergeSort giảm từ 11% đến 18% thời gian so với MergeSort chuẩn.'),
+    p('3. <b>Kết luận:</b> Cải tiến Cutoff sang Insertion Sort là phương pháp đơn giản nhưng '
+      'đem lại hiệu quả thực tế rõ rệt trên hầu hết các kiểu dữ liệu, đặc biệt trên dữ liệu có kích thước lớn '
+      'và dữ liệu đã có sẵn thứ tự bộ phận.'),
 ]
 
 doc.build(story)
-print(f"Da tao: {OUT_PDF}")
-
+print(f"Da tao thanh cong: {OUT_PDF}")

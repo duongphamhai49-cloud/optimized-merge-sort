@@ -7,17 +7,25 @@ public class BenchmarkRunner {
     static final int REPS   = 5;
     static final int[] SIZES   = {1000, 10000, 100000, 500000, 1000000};
     static final int[] CUTOFFS = {1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 32, 48, 64};
-    static final String[] TYPES = {"random", "sorted", "reversed", "duplicates"};
+    static final String[] TYPES = {
+        "random", 
+        "sorted", 
+        "reversed", 
+        "duplicates", 
+        "partially_sorted_1pct", 
+        "partially_sorted_5pct", 
+        "partially_sorted_10pct"
+    };
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Bat dau benchmark...\n");
+        System.out.println("Bat dau benchmark (7 bo du lieu)...\n");
         new File("results").mkdirs();
 
         PrintWriter raw = new PrintWriter("results/raw_results.csv", "UTF-8");
         raw.println("size,type,algorithm,cutoff,rep,time_ms");
 
-        // Phan 1: So sanh MergeSort vs OptimizedMergeSort (cutoff=8) tren cac kich thuoc
-        System.out.println("--- So sanh MergeSort vs OptimizedMergeSort ---");
+        // Phan 1: So sanh MergeSort vs OptimizedMergeSort (cutoff=8) tren ca 7 kieu du lieu
+        System.out.println("--- So sanh MergeSort vs OptimizedMergeSort tren 7 kieu du lieu ---");
         PrintWriter sumWriter = new PrintWriter("results/summary.csv", "UTF-8");
         sumWriter.println("size,type,merge_ms,optimized_ms,speedup_pct");
 
@@ -28,6 +36,7 @@ public class BenchmarkRunner {
 
                 Integer[] data = generate(size, type, 0);
 
+                // Warm up
                 for (int w = 0; w < WARMUP; w++) {
                     Integer[] tmp = data.clone();
                     MergeSort.sort(tmp);
@@ -35,6 +44,7 @@ public class BenchmarkRunner {
                     OptimizedMergeSort.sort(tmp, 8);
                 }
 
+                // Do thuc te
                 for (int r = 0; r < REPS; r++) {
                     Integer[] a = data.clone();
                     long t0 = System.nanoTime();
@@ -53,7 +63,7 @@ public class BenchmarkRunner {
                 double avgO = mean(optT);
                 double speedup = (avgM - avgO) / avgM * 100.0;
                 sumWriter.printf("%d,%s,%.3f,%.3f,%.1f%n", size, type, avgM, avgO, speedup);
-                System.out.printf("  n=%-8d  %-12s  Merge=%.2fms  Opt=%.2fms  Speedup=%.1f%%%n",
+                System.out.printf("  n=%-8d  %-24s  Merge=%.2fms  Opt=%.2fms  Speedup=%.1f%%%n",
                         size, type, avgM, avgO, speedup);
             }
         }
@@ -108,6 +118,33 @@ public class BenchmarkRunner {
             case "duplicates":
                 for (int i = 0; i < n; i++) a[i] = rng.nextInt(100);
                 break;
+            case "partially_sorted_1pct": {
+                for (int i = 0; i < n; i++) a[i] = i;
+                int swaps = Math.max(1, (int)(n * 0.01));
+                for (int i = 0; i < swaps; i++) {
+                    int i1 = rng.nextInt(n), i2 = rng.nextInt(n);
+                    int t = a[i1]; a[i1] = a[i2]; a[i2] = t;
+                }
+                break;
+            }
+            case "partially_sorted_5pct": {
+                for (int i = 0; i < n; i++) a[i] = i;
+                int swaps = Math.max(1, (int)(n * 0.05));
+                for (int i = 0; i < swaps; i++) {
+                    int i1 = rng.nextInt(n), i2 = rng.nextInt(n);
+                    int t = a[i1]; a[i1] = a[i2]; a[i2] = t;
+                }
+                break;
+            }
+            case "partially_sorted_10pct": {
+                for (int i = 0; i < n; i++) a[i] = i;
+                int swaps = Math.max(1, (int)(n * 0.10));
+                for (int i = 0; i < swaps; i++) {
+                    int i1 = rng.nextInt(n), i2 = rng.nextInt(n);
+                    int t = a[i1]; a[i1] = a[i2]; a[i2] = t;
+                }
+                break;
+            }
         }
         return a;
     }

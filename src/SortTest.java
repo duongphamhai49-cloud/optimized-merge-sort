@@ -8,6 +8,7 @@ public class SortTest {
     public static void main(String[] args) {
         testMergeSort();
         testOptimizedMergeSort();
+        testPartiallySorted();
         System.out.println("\nKet qua: " + passed + " passed, " + failed + " failed.");
     }
 
@@ -73,7 +74,6 @@ public class SortTest {
             if (ok) passed++; else failed++;
         }
 
-        // Bien bien vung bien cutoff
         Integer[] exact = new Integer[8];
         for (int i = 0; i < 8; i++) exact[i] = 8 - i;
         check("Dung bang cutoff (n=8, cutoff=8)", exact);
@@ -82,5 +82,37 @@ public class SortTest {
         for (int i = 0; i < 9; i++) overCutoff[i] = 9 - i;
         check("Vuot cutoff (n=9, cutoff=8)", overCutoff);
     }
-}
 
+    static void testPartiallySorted() {
+        System.out.println("\n=== Kiem tra du lieu Partially Sorted (1%, 5%, 10%) ===");
+        Random rng = new Random(12345);
+        int n = 1000;
+
+        // Partially Sorted 1%
+        Integer[] p1 = new Integer[n];
+        for (int i = 0; i < n; i++) p1[i] = i;
+        for (int i = 0; i < (int)(n * 0.01); i++) {
+            int i1 = rng.nextInt(n), i2 = rng.nextInt(n);
+            int t = p1[i1]; p1[i1] = p1[i2]; p1[i2] = t;
+        }
+        check("Partially Sorted (1% xao tron)", p1);
+
+        // Partially Sorted 5%
+        Integer[] p5 = new Integer[n];
+        for (int i = 0; i < n; i++) p5[i] = i;
+        for (int i = 0; i < (int)(n * 0.05); i++) {
+            int i1 = rng.nextInt(n), i2 = rng.nextInt(n);
+            int t = p5[i1]; p5[i1] = p5[i2]; p5[i2] = t;
+        }
+        check("Partially Sorted (5% xao tron)", p5);
+
+        // Partially Sorted 10%
+        Integer[] p10 = new Integer[n];
+        for (int i = 0; i < n; i++) p10[i] = i;
+        for (int i = 0; i < (int)(n * 0.10); i++) {
+            int i1 = rng.nextInt(n), i2 = rng.nextInt(n);
+            int t = p10[i1]; p10[i1] = p10[i2]; p10[i2] = t;
+        }
+        check("Partially Sorted (10% xao tron)", p10);
+    }
+}
