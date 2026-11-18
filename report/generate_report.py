@@ -11,10 +11,10 @@ try:
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
 except ImportError:
-    print("Cai dat reportlab: pip install reportlab")
+    print("Cài đặt reportlab: pip install reportlab")
     sys.exit(1)
 
-# Dang ky font Times New Roman ho tro tieng Viet
+# Đăng ký font Times New Roman hỗ trợ tiếng Việt
 FONT_PATH = r"C:\Windows\Fonts\times.ttf"
 FONT_BOLD = r"C:\Windows\Fonts\timesbd.ttf"
 FONT_ITALIC = r"C:\Windows\Fonts\timesi.ttf"
@@ -46,9 +46,8 @@ def style(name, font='Times', size=10, leading=14, space_before=0, space_after=4
         alignment=alignment,
     )
 
-S_title   = style('Title',   size=15, leading=19, bold=True, alignment=1, space_after=4)
-S_sub     = style('Sub',     size=10.5, leading=14, font='Times-Italic', alignment=1, space_after=2)
-S_info    = style('Info',    size=10, leading=14, alignment=1, space_after=6)
+S_title   = style('Title',   size=15, leading=19, bold=True, alignment=1, space_after=2)
+S_sub     = style('Sub',     size=10.5, leading=14, alignment=1, space_after=6)
 S_h1      = style('H1',      size=11.5, leading=15, bold=True, space_before=8, space_after=3)
 S_h2      = style('H2',      size=10.5, leading=14, bold=True, space_before=5, space_after=2)
 S_body    = style('Body',    size=9.5, leading=13.5, space_after=4)
@@ -65,7 +64,7 @@ summary_df = pd.read_csv('results/summary.csv')
 best_cutoff = int(cutoff_df.loc[cutoff_df['time_ms'].idxmin(), 'cutoff'])
 best_time   = cutoff_df['time_ms'].min()
 
-def fig(path, w_cm=11.5, h_cm=5.8, caption=''):
+def fig(path, w_cm=11.5, h_cm=5.5, caption=''):
     items = []
     if os.path.exists(path):
         items.append(Image(path, width=w_cm*cm, height=h_cm*cm))
@@ -91,12 +90,13 @@ def tbl(data, col_widths=None, font_size=8.5):
 story = []
 
 # ============================================================
-# PHAN DAU: TIEU DE VA THONG TIN SINH VIEN (KHONG DUNG TRANG BIA)
+# PHAN DAU: TIEU DE VA THONG TIN THEO DUNG YEU CAU
 # ============================================================
 story += [
-    p('BÁO CÁO THỰC NGHIỆM: TỐI ƯU HÓA MERGE SORT VỚI CUTOFF', S_title),
-    p('Môn học: Cấu trúc Dữ liệu và Giải thuật — Trường Đại học Công nghệ, ĐHQGHN', S_sub),
-    p('<b>Sinh viên:</b> Phạm Hải Dương &nbsp;|&nbsp; <b>Mã SV:</b> 25021700 &nbsp;|&nbsp; <b>Ngành:</b> Khoa học Máy tính', S_info),
+    p('BÁO CÁO THỰC NGHIỆM', S_title),
+    p('TỐI ƯU HÓA MERGE SORT VỚI CUTOFF', S_title),
+    sp(2),
+    p('Sinh viên: Phạm Hải Dương &nbsp;|&nbsp; MSV: 25021700', S_sub),
     HRFlowable(width="100%", thickness=1, color=colors.black, spaceBefore=2, spaceAfter=8),
 ]
 
@@ -105,12 +105,12 @@ story += [
 # ============================================================
 story += [
     h1('1. Tổng quan và Cơ sở lý thuyết'),
-    p('<b>Mục tiêu:</b> Khảo sát kỹ thuật cải tiến Merge Sort bằng cách chuyển sang Insertion Sort khi kích thước mảng con nhỏ hơn hoặc bằng một ngưỡng <i>cutoff</i> nhất định (<i>hi ≤ lo + cutoff − 1</i>).'),
-    p('<b>Lý thuyết:</b> Merge Sort có độ phức tạp O(n log n) nhưng với mảng con nhỏ, chi phí gọi đệ quy và trộn qua mảng phụ aux[] tạo ra overhead đáng kể. Insertion Sort có chi phí hằng số rất nhỏ, chạy nhanh trên mảng con ngắn và mảng gần như đã sắp xếp. Việc kết hợp hai thuật toán nhằm khai thác ưu điểm của cả hai.'),
+    p('<b>Mục tiêu:</b> Khảo sát kỹ thuật cải tiến Merge Sort bằng cách chuyển sang Insertion Sort khi kích thước mảng con nhỏ hơn hoặc bằng một ngưỡng <b>CUTOFF</b> nhất định (<i>hi ≤ lo + CUTOFF − 1</i>).'),
+    p('<b>Lý thuyết:</b> Merge Sort có độ phức tạp O(n log n) nhưng với mảng con nhỏ, chi phí gọi đệ quy và trộn qua mảng phụ aux[] tạo ra overhead đáng kể. Insertion Sort có chi phí hằng số rất nhỏ, chạy nhanh trên mảng con ngắn và mảng gần như đã sắp xếp. Việc kết hợp hai thuật toán qua ngưỡng CUTOFF nhằm khai thác ưu thế của cả hai.'),
 ]
 
 # ============================================================
-# 2. CAI DAT VA BO DU LIEU
+# 2. CAI DAT VA PHUONG PHAP
 # ============================================================
 story += [
     h1('2. Cài đặt thuật toán và Phương pháp thực nghiệm'),
@@ -124,17 +124,16 @@ story += [
 # ============================================================
 story += [
     h1('3. Kết quả thực nghiệm và Phân tích'),
-    h2('3.1. Xác định giá trị Cutoff tối ưu (n = 100.000, dữ liệu ngẫu nhiên)'),
+    h2('3.1. Xác định giá trị CUTOFF tối ưu (n = 100.000, dữ liệu ngẫu nhiên)'),
 ]
 
-# Bang cutoff dang ngang de tiet kiem dien tich
-cutoff_row1 = ['Cutoff'] + [str(int(c)) for c in cutoff_df['cutoff'][:7]]
+# Bang CUTOFF dang ngang
+cutoff_row1 = ['CUTOFF'] + [str(int(c)) for c in cutoff_df['cutoff'][:7]]
 time_row1   = ['Thời gian (ms)'] + [f"{t:.1f}" for t in cutoff_df['time_ms'][:7]]
-cutoff_row2 = ['Cutoff'] + [str(int(c)) for c in cutoff_df['cutoff'][7:]]
+cutoff_row2 = ['CUTOFF'] + [str(int(c)) for c in cutoff_df['cutoff'][7:]]
 time_row2   = ['Thời gian (ms)'] + [f"{t:.1f}" for t in cutoff_df['time_ms'][7:]]
 
 cutoff_table_data = [cutoff_row1, time_row1, cutoff_row2, time_row2]
-# Danh dau moc toi uu
 for r in [1, 3]:
     for c_idx in range(1, len(cutoff_table_data[r])):
         c_val = int(cutoff_table_data[r-1][c_idx])
@@ -144,9 +143,9 @@ for r in [1, 3]:
 story.append(tbl(cutoff_table_data, col_widths=[2.8*cm] + [1.8*cm]*7, font_size=8))
 story.append(sp(4))
 story += fig('report/figures/fig1_cutoff_vs_time.png', w_cm=11.5, h_cm=5.2,
-             caption=f'Hình 1. Thời gian chạy theo giá trị Cutoff (n=100.000, ngẫu nhiên). Giá trị tối ưu: cutoff = {best_cutoff} ({best_time:.2f} ms).')
+             caption=f'Hình 1. Thời gian chạy theo giá trị CUTOFF (n=100.000, ngẫu nhiên). Giá trị tối ưu: CUTOFF = {best_cutoff} ({best_time:.2f} ms).')
 
-story.append(h2('3.2. So sánh hiệu năng theo kích thước mảng (Dữ liệu ngẫu nhiên, cutoff = 8)'))
+story.append(h2('3.2. So sánh hiệu năng theo kích thước mảng (Dữ liệu ngẫu nhiên, CUTOFF = 8)'))
 rand_df = summary_df[summary_df['type'] == 'random'].sort_values('size')
 size_data = [['Kích thước (n)', 'MergeSort (ms)', 'Optimized (ms)', 'Tốc độ cải thiện']]
 for _, row in rand_df.iterrows():
@@ -161,7 +160,7 @@ story.append(sp(4))
 story += fig('report/figures/fig2_size_vs_time.png', w_cm=11.5, h_cm=5.2,
              caption='Hình 2. Thời gian chạy của MergeSort và OptimizedMergeSort theo kích thước mảng.')
 
-story.append(h2('3.3. Đánh giá hiệu năng trên 7 kiểu dữ liệu (n = 1.000.000, cutoff = 8)'))
+story.append(h2('3.3. Đánh giá hiệu năng trên 7 kiểu dữ liệu (n = 1.000.000, CUTOFF = 8)'))
 large_df = summary_df[summary_df['size'] == 1000000]
 type_names = {
     'random': 'Ngẫu nhiên (Random)',
@@ -190,10 +189,10 @@ story += fig('report/figures/fig4_distribution.png', w_cm=12.5, h_cm=5.5,
 # ============================================================
 story += [
     h1('4. Nhận xét và Kết luận'),
-    p(f'1. <b>Ngưỡng Cutoff tối ưu:</b> Thực nghiệm cho thấy vùng cutoff hiệu quả nhất nằm trong khoảng <b>6 đến 16</b> (đạt tốt nhất tại cutoff = {best_cutoff}). Nếu cutoff quá nhỏ (&lt; 4), chưa giảm được overhead đệ quy; nếu cutoff quá lớn (&gt; 32), độ phức tạp O(k²) của Insertion Sort bắt đầu làm chậm chương trình.'),
-    p('2. <b>Ưu thế trên dữ liệu gần sắp xếp:</b> Trên các tập dữ liệu Partially Sorted (1%, 5%, 10%), OptimizedMergeSort cải thiện từ <b>8% đến 13%</b> thời gian chạy. Điều này chứng minh Insertion Sort phát huy tối đa lợi thế khi số nghịch thế (inversions) nhỏ.'),
-    p('3. <b>Kết luận:</b> Cải tiến Cutoff sang Insertion Sort là một kỹ thuật đơn giản, dễ cài đặt nhưng đem lại hiệu quả thực tế rõ ràng, đặc biệt trên các bộ dữ liệu lớn và dữ liệu có thứ tự một phần.'),
+    p(f'1. <b>Ngưỡng CUTOFF tối ưu:</b> Thực nghiệm cho thấy vùng CUTOFF hiệu quả nhất nằm trong khoảng <b>6 đến 16</b> (đạt tốt nhất tại CUTOFF = {best_cutoff}). Nếu CUTOFF quá nhỏ (&lt; 4), chưa giảm được overhead đệ quy; nếu CUTOFF quá lớn (&gt; 32), độ phức tạp O(k²) của Insertion Sort bắt đầu làm chậm chương trình.'),
+    p('2. <b>Ưu thế trên dữ liệu gần sắp xếp:</b> Trên các tập dữ liệu Partially Sorted (1%, 5%, 10%), việc áp dụng CUTOFF giúp OptimizedMergeSort cải thiện từ <b>8% đến 13%</b> thời gian chạy. Điều này chứng minh Insertion Sort phát huy tối đa lợi thế khi số nghịch thế (inversions) nhỏ.'),
+    p('3. <b>Kết luận:</b> Cải tiến CUTOFF sang Insertion Sort là một kỹ thuật đơn giản, dễ cài đặt nhưng đem lại hiệu quả thực tế rõ ràng, đặc biệt trên các bộ dữ liệu lớn và dữ liệu có thứ tự một phần.'),
 ]
 
 doc.build(story)
-print("Da tao thanh cong bao cao gon gang:")
+print("Đã tạo thành công báo cáo PDF với tiêu đề mới và chữ CUTOFF in hoa.")

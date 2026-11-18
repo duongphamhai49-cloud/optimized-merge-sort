@@ -1,14 +1,13 @@
-# Merge Sort tối ưu với Cutoff
+# Merge Sort tối ưu với CUTOFF
 
 **Sinh viên:** Phạm Hải Dương — MSV: 25021700  
-**Ngành:** Khoa học Máy tính — Trường ĐH Công nghệ, ĐHQGHN  
 **Môn:** Cấu trúc Dữ liệu và Giải thuật
 
 ---
 
 ## Giới thiệu
 
-Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `cutoff`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. Mục tiêu là tìm giá trị cutoff tốt nhất.
+Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `CUTOFF`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. Mục tiêu là tìm giá trị CUTOFF tốt nhất.
 
 Cả ba thuật toán đều cài đặt theo đúng giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne). Thực nghiệm được tiến hành trên **7 kiểu phân bố dữ liệu** với kích thước lên tới 1.000.000 phần tử.
 
@@ -33,17 +32,17 @@ optimized-merge-sort/
 ├── src/
 │   ├── InsertionSort.java       # Thuật toán Insertion Sort
 │   ├── MergeSort.java           # Thuật toán Merge Sort chuẩn
-│   ├── OptimizedMergeSort.java  # Merge Sort với cutoff
+│   ├── OptimizedMergeSort.java  # Merge Sort với CUTOFF
 │   └── SortTest.java            # Bộ kiểm tra tính đúng đắn (22/22 tests PASS)
 ├── benchmark/
 │   └── BenchmarkRunner.java     # Đo thời gian trên 7 kiểu dữ liệu
 ├── results/
 │   ├── raw_results.csv          # Toàn bộ số liệu đo thô
 │   ├── summary.csv              # Bảng tóm tắt kết quả
-│   └── cutoff_results.csv       # Kết quả khảo sát các giá trị cutoff
+│   └── cutoff_results.csv       # Kết quả khảo sát các giá trị CUTOFF
 ├── report/
-│   ├── figures/                 # 4 biểu đồ kết quả (.png)
-│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức
+│   ├── figures/                 # 4 biểu đồ kết quả (.png có dấu tiếng Việt)
+│   ├── BAO_CAO.pdf              # Báo cáo PDF chính thức (2 trang gọn gàng)
 │   ├── plot_charts.py           # Script vẽ biểu đồ
 │   └── generate_report.py       # Script xuất PDF
 ├── logs/
@@ -83,10 +82,10 @@ python report/generate_report.py
 
 ## Kết quả thực nghiệm chính
 
-### 1. Khảo sát Cutoff tối ưu (n = 100.000, ngẫu nhiên)
-* Vùng cutoff tốt nhất: **6 – 16** (đạt cực tiểu tại cutoff = 16 với ~18.3 ms).
+### 1. Khảo sát CUTOFF tối ưu (n = 100.000, ngẫu nhiên)
+* Vùng CUTOFF tốt nhất: **6 – 16** (đạt cực tiểu tại CUTOFF = 16 với ~18.3 ms).
 
-### 2. Hiệu năng theo kiểu dữ liệu (n = 1.000.000, cutoff = 8)
+### 2. Hiệu năng theo kiểu dữ liệu (n = 1.000.000, CUTOFF = 8)
 
 | Kiểu dữ liệu | MergeSort (ms) | Optimized (ms) | Cải thiện (%) |
 |---|---|---|---|
