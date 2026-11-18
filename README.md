@@ -26,9 +26,9 @@ Toàn bộ các phép đo được thực hiện trực tiếp trên hệ thốn
 
 ---
 
-## 3. Phương pháp Thực Nghiệm (Algorithm Analysis)
+## 3. Phương pháp Thực Nghiệm
 
-Để đảm bảo kết quả đo lường khách quan, chính xác và có tính tái lập (reproducibility), quy trình đo tuân thủ các nguyên tắc khoa học:
+Để đảm bảo kết quả đo lường khách quan, chính xác và có tính tái lập, quy trình đo tuân thủ các nguyên tắc khoa học:
 1. **Khử sai số khởi động lạnh (JVM Warm-up):** Thực hiện các chu kỳ chạy mồi trước khi bấm giờ để trình biên dịch JIT (Just-In-Time) của JVM hoàn tất tối ưu mã máy.
 2. **Khử nhiễu Garbage Collection (Trimmed Mean):** Khi khảo sát CUTOFF, mỗi mốc được đo 7 lần độc lập. Sử dụng phương pháp *Trimmed Mean* (tự động loại bỏ 1 lần nhanh nhất và 1 lần chậm nhất do GC pause đột biến) để lấy giá trị trung bình 5 lần chạy ổn định ở giữa.
 3. **Tính tái lập:** Dữ liệu sinh bằng `java.util.Random` với seed cố định (`42` hoặc `123456`). Dữ liệu được sinh ngoài vùng đo thời gian, mỗi thuật toán nhận bản sao độc lập (`.clone()`).
