@@ -18,3 +18,4 @@ public class InsertionSort {
         Object t = a[i]; a[i] = a[j]; a[j] = t;
     }
 }
+

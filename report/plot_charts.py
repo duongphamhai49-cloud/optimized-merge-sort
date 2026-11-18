@@ -103,3 +103,4 @@ fig.savefig('report/figures/fig4_distribution.png')
 plt.close()
 
 print("Da tao xong 4 bieu do trong report/figures/")
+

@@ -227,3 +227,4 @@ story += [
 
 doc.build(story)
 print(f"Da tao: {OUT_PDF}")
+
