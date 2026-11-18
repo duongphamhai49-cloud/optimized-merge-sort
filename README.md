@@ -1,14 +1,14 @@
 # Merge Sort tối ưu với Cutoff
 
-**Sinh viên:** Phạm Hải Dương — MSV: 25021700  
-**Ngành:** Khoa học Máy tính — Trường ĐH Công nghệ, ĐHQGHN  
+**Sinh viên:** Phạm Hải Dương - MSV: 25021700  
+**Ngành:** Khoa học Máy tính - Trường ĐH Công nghệ, ĐHQGHN  
 **Môn:** Cấu trúc Dữ liệu và Giải thuật
 
 ---
 
 ## Giới thiệu
 
-Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `cutoff`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. Mục tiêu là tìm giá trị cutoff tốt nhất.
+Dự án cài đặt và thực nghiệm thuật toán **Merge Sort tối ưu**: khi kích thước mảng con ≤ `CUTOFF`, chuyển sang dùng **Insertion Sort** thay vì tiếp tục đệ quy. Mục tiêu là tìm giá trị cutoff tốt nhất.
 
 Cả ba thuật toán đều cài đặt theo giáo trình *Algorithms 4th Edition* (Sedgewick & Wayne).
 
